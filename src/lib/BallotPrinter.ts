@@ -1,25 +1,82 @@
 import type { PrintSettings } from "@/lib/PrintSettings";
-import { PageSizes, PDFDocument, PDFPage } from "pdf-lib";
+import { componentsToColor, PageSizes, PDFDocument, PDFFont, PDFImage, PDFPage } from "pdf-lib";
+import { Rect } from "@/lib/Rect";
+import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
+import { Vector2D } from "@/lib/Vector2D";
+import ubuntuRegularUrl from "@/assets/Ubuntu-Regular.ttf?url";
+import logoUrl from "@/assets/logo-dark.png?url";
+import fontkit from "@pdf-lib/fontkit";
+import axios from "axios";
+import type { Vote } from "@/lib/Vote";
 
-interface Rect {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-}
+type PageSetupSize = (page: PDFPage) => number[][];
+
+const pageSizes: { A4: { [k: number]: [number, number] } } = {
+	A4: {
+		1: PageSizes.A4,
+		2: [PageSizes.A4[1], PageSizes.A4[0]],
+		4: PageSizes.A4
+	}
+};
+
+const pageSetup: { A4: { 1: PageSetupSize, 2: PageSetupSize, 4: PageSetupSize } } = {
+	A4: {
+		1: (page: PDFPage) => {
+			return [
+				[0, 0, page.getWidth(), page.getHeight()]
+			];
+		},
+		2: (page: PDFPage) => {
+			return [
+				[0, 0, page.getWidth() / 2, page.getHeight()],
+				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight()]
+			];
+		},
+		4: (page: PDFPage) => {
+			return [
+				[0, 0, page.getWidth() / 2, page.getHeight() / 2],
+				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight() / 2],
+				[0, page.getHeight() / 2, page.getWidth() / 2, page.getHeight() / 2],
+				[page.getWidth() / 2, page.getHeight() / 2, page.getWidth() / 2, page.getHeight() / 2]
+			];
+		}
+	}
+};
 
 export class BallotPrinter {
+	private ubuntu: PDFFont | undefined;
+	private image: PDFImage | undefined;
 
 	constructor(private printSettings: PrintSettings) {
+		console.log(this.printSettings);
+	}
+
+	private async loadAssets(pdfDoc: PDFDocument) {
+		const ubuntuRegularBuffer = await axios.get(ubuntuRegularUrl, { responseType: "arraybuffer" });
+		const logoBuffer = await axios.get(logoUrl, { responseType: "arraybuffer" });
+
+		this.image = await pdfDoc.embedPng(logoBuffer.data);
+		this.ubuntu = await pdfDoc.embedFont(ubuntuRegularBuffer.data);
 	}
 
 	public async print(): Promise<string> {
+
 		const pdfDoc = await PDFDocument.create();
-		const page = pdfDoc.addPage(PageSizes[this.printSettings.pageSize]);
-		const rect = { x: 0, y: 0, width: page.getWidth(), height: page.getHeight() };
 
-		await this.printBallot(page, rect);
+		pdfDoc.registerFontkit(fontkit);
+		await this.loadAssets(pdfDoc);
 
+		const pageSize = pageSizes[this.printSettings.pageSize][this.printSettings.ballotsPerPage];
+		const page = pdfDoc.addPage(pageSize);
+		const xywhs = pageSetup[this.printSettings.pageSize][this.printSettings.ballotsPerPage](page);
+
+		for (const xywh of xywhs) {
+			console.log(xywh.toString());
+			await this.printBallot(page, new Rect(
+				new Vector2D(dpt2mm(xywh[0]), dpt2mm(xywh[1])),
+				new Vector2D(dpt2mm(xywh[2]), dpt2mm(xywh[3]))
+			));
+		}
 		return await pdfDoc.saveAsBase64({ dataUri: true });
 	}
 
@@ -27,14 +84,113 @@ export class BallotPrinter {
 		return rect;
 	}
 
-	private async printBallot(page: PDFPage, rect: Rect): Promise<Rect> {
+	private drawText(page: PDFPage, text: string, fontSize: number, rect: Rect): Vector2D {
 
-		const y = rect.y;
+		const fontHeight = this.ubuntu!.heightAtSize(fontSize);
 
-		for (const vote of this.printSettings.votes) {
-			page.drawText(vote.title, { x: rect.x, y: y });
+		// split text into lines
+		const words = text.split(" ");
+		let current = "";
+		const lines: string[] = [];
+
+		while (words.length > 0) {
+			const word = words.shift()!;
+			const width = dpt2mm(this.ubuntu!.widthOfTextAtSize(current + " " + word, fontSize));
+			if (rect.width() <= width) {
+				lines.push(current);
+				current = "";
+			}
+			current += word + " ";
+		}
+		lines.push(current);
+
+		let rectx = rect;
+		for (const line of lines) {
+
+			const y = page.getHeight() - (fontHeight + mm2dpt(rectx.top()));
+
+			const width = mm2dpt(rectx.width());
+			const height = fontSize;
+			const x = mm2dpt(rectx.left());
+			console.log(`page.drawRectangle({ x: ${x}, y: ${y}, width: ${width}, height: ${height} });`);
+
+			page.drawRectangle({
+				borderWidth: mm2dpt(0.5),
+				borderColor: componentsToColor([1, 0, 0]),
+				x, y, width, height
+			});
+
+			console.log(`page.drawText(${text}, { x: ${x}, y: ${y}, size: ${fontSize}, maxWidth: ${width} });`);
+			page.drawText(line, { x, y, size: fontSize, maxWidth: width, font: this.ubuntu, lineHeight: fontSize });
+			rectx = rect.shrinkFromTop(dpt2mm(fontHeight));
 		}
 
+		return new Vector2D(rect.width(), lines.length * dpt2mm(fontHeight));
+	}
+
+	private async printBallot(page: PDFPage, rect0: Rect): Promise<Rect> {
+
+		console.log(rect0.toString());
+		let rect = rect0.shrinkByPadding(5);
+		console.log(rect.toString());
+
+		const imageWidth = mm2dpt(30);
+		const imageHeight = (this.image!.height / this.image!.width) * imageWidth;
+
+		page.drawImage(this.image!, {
+			x: page.getWidth() - (mm2dpt(rect.left()) + imageWidth),
+			y: page.getHeight() - (mm2dpt(rect.top()) + imageHeight),
+			width: imageWidth,
+			height: imageHeight
+		});
+
+		const text = `Stimmzettel zum ${this.printSettings.veranstaltung} von ${this.printSettings.verbandName}`;
+		rect = rect.shrinkFromTop(this.drawText(page, text, 14, rect.shrinkFromRight(dpt2mm(imageWidth))).y);
+
+		rect = rect.shrinkFromTop(10);
+
+		for (const vote of this.printSettings.votes) {
+
+			const text = `Wahl zur*zum ${vote.config.toElect} von ${this.printSettings.verbandName}`;
+
+			rect = rect.shrinkFromTop(this.drawText(page, text, 14, rect).y);
+
+			for (const name of vote.config.namen) {
+				rect = rect.shrinkFromTop(this.drawText(page, name, 12, rect).y);
+			}
+
+			switch (vote.system) {
+				case "ew":
+					this.renderEw(page, vote, rect)
+					break;
+				case "vew":
+					break;
+				case "que":
+					break;
+				case "borda":
+					break;
+				case "star":
+					break;
+			}
+
+			console.log(rect.toString());
+		}
+
+		console.log(rect.toString());
 		return rect;
 	}
+
+	renderEw(page: PDFPage, vote: Vote, rect0: Rect) {
+
+		let rect = rect0;
+
+		const text = `Gewählt wird nach ${vote.config.referenz} in verbindung mit § 19 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist wer mehr als 50 % der Stimmen erhält. Enthaltungen werden durch Freilassen der Felder gekennzeichnet und werden als Nicht abgegebene Stimmen gezählt.`
+		const text2 = `Sie haben 1 Stimme`
+
+		rect = rect.shrinkFromTop(this.drawText(page, text, 12, rect).y);
+		rect = rect.shrinkFromTop(this.drawText(page, text2, 14, rect).y);
+
+	}
+
+
 }

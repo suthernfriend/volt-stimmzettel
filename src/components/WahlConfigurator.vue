@@ -21,6 +21,7 @@ const names = ref<string>("");
 
 const voteConfiguration = computed(() => {
 	return {
+		toElect: toElect.value,
 		hoechstePunktzahl: hoechstePunktzahl.value,
 		referenz: referenz.value,
 		anzahlAemter: anzahlAemter.value,
@@ -28,17 +29,14 @@ const voteConfiguration = computed(() => {
 	} satisfies VoteConfiguration;
 });
 
-watch(voteConfiguration, value => {
+watch(voteConfiguration, (value) => {
 	emits("update:modelValue", value);
 }, { deep: true });
-
-if (!system)
-	throw new Error("Wahlsystem nicht gefunden");
 
 </script>
 
 <template>
-	<h3 class="title is-4">Wahl #{{ props.id }}: {{ system.name }}</h3>
+	<h3 class="title is-4">Wahl #{{ props.id }}: {{ system.name }} / {{ toElect }}</h3>
 	<div class="field">
 		<label class="label">Zu wählendes Amt / Mandat (@ steht für den Verband)</label>
 		<input v-model="toElect" type="text" class="input"
