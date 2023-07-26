@@ -13,11 +13,11 @@ const props = defineProps<{
 const emits = defineEmits(["update:modelValue"]);
 const system = VotingSystems.find(value => value.system == props.system);
 
-const toElect = ref<string>("");
-const referenz = ref<string>("");
-const hoechstePunktzahl = ref<number>(10);
-const anzahlAemter = ref<number>(3);
-const names = ref<string>("");
+const toElect = ref<string>(props.modelValue.toElect);
+const referenz = ref<string>(props.modelValue.referenz);
+const hoechstePunktzahl = ref<number>(props.modelValue.hoechstePunktzahl);
+const anzahlAemter = ref<number>(props.modelValue.anzahlAemter);
+const names = ref<string>(props.modelValue.namen.join("\n"));
 
 const voteConfiguration = computed(() => {
 	return {

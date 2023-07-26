@@ -45,9 +45,6 @@ watch(config, () => {
 			</div>
 		</div>
 	</nav>
-
-	{{ config }}
-
 	<div class="container mt-5">
 		<main class="columns">
 			<div class="column is-half">

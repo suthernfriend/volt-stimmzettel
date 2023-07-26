@@ -7,9 +7,15 @@ export interface VoteConfiguration {
 }
 
 export const defaultConfiguration: VoteConfiguration = {
-	toElect: "",
+	toElect: "Vorsitzender",
 	hoechstePunktzahl: 10,
 	anzahlAemter: 3,
-	namen: [],
-	referenz: ""
+	namen: [
+		"Craig Juarez",
+		"Jayla Hagan",
+		"Kristen Carreon",
+		"Nikki Cleary",
+		"Daryl Pinto"
+	],
+	referenz: "§ 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 };

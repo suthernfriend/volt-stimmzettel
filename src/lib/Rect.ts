@@ -57,6 +57,13 @@ export class Rect {
 		);
 	}
 
+	shrinkFromLeft(by: number): Rect {
+		return new Rect(
+			this._topLeft.add(new Vector2D(by, 0)),
+			this._size.sub(new Vector2D(by, 0))
+		);
+	}
+
 	shrinkByPadding(padding: number): Rect {
 		return new Rect(
 			this._topLeft.add(new Vector2D(padding, padding)),
