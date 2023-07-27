@@ -35,6 +35,7 @@ watch(config, () => {
 </script>
 
 <template>
+	{{ config }}
 	<nav class="navbar is-primary">
 		<div class="container">
 			<div class="navbar-brand">

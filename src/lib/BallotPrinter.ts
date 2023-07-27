@@ -4,18 +4,36 @@ import { Rect } from "@/lib/Rect";
 import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
 import ubuntuRegularUrl from "@/assets/Ubuntu-Regular.ttf?url";
-import logoUrl from "@/assets/logo-dark.png?url";
+import logoUrl from "@/assets/logo2.png?url";
 import fontkit from "@pdf-lib/fontkit";
 import axios from "axios";
 import type { Vote } from "@/lib/Vote";
 
 type PageSetupSize = (page: PDFPage) => number[][];
+type HelpLines = (page: PDFPage) => number[][];
 
 const pageSizes: { A4: { [k: number]: [number, number] } } = {
 	A4: {
 		1: PageSizes.A4,
 		2: [PageSizes.A4[1], PageSizes.A4[0]],
 		4: PageSizes.A4
+	}
+};
+
+const helpLines: { A4: { [k: number]: HelpLines } } = {
+	A4: {
+		1: (page: PDFPage) => [],
+		2: (page: PDFPage) => {
+			return [
+				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight()]
+			];
+		},
+		4: (page: PDFPage) => {
+			return [
+				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight()],
+				[0, page.getHeight() / 2, page.getWidth(), page.getHeight() / 2]
+			];
+		}
 	}
 };
 
@@ -46,9 +64,21 @@ const pageSetup: { A4: { 1: PageSetupSize, 2: PageSetupSize, 4: PageSetupSize } 
 export class BallotPrinter {
 	private ubuntu: PDFFont | undefined;
 	private image: PDFImage | undefined;
+	private ballotId: string;
 
 	constructor(private printSettings: PrintSettings) {
 		console.log(this.printSettings);
+		this.ballotId = this.randomIDString(8);
+	}
+
+	private randomIDString(len: number): string {
+		const firstAlphabet = "CFGHJKLMNPRTVWXYZ";
+		const alphabet = "1234567890CFGHJKLMNPRTVWXYZ";
+		let result = firstAlphabet[Math.floor(Math.random() * firstAlphabet.length)];
+		for (let i = 1; i < len; i++) {
+			result += alphabet[Math.floor(Math.random() * alphabet.length)];
+		}
+		return result;
 	}
 
 	private async loadAssets(pdfDoc: PDFDocument) {
@@ -112,11 +142,11 @@ export class BallotPrinter {
 			const x = mm2dpt(rectx.left());
 			const y = page.getHeight() - (fontHeight + mm2dpt(rectx.top()));
 
-			page.drawRectangle({
-				borderWidth: mm2dpt(0.2),
-				borderColor: componentsToColor([1, 0, 0]),
-				x, y, width, height
-			});
+			// page.drawRectangle({
+			// 	borderWidth: mm2dpt(0.2),
+			// 	borderColor: componentsToColor([1, 0, 0]),
+			// 	x, y, width, height
+			// });
 
 			console.log(`{ ${line}, ${x}, ${y}, size: ${fontSize}, maxWidth: ${width}, font: this.ubuntu, lineHeight: ${fontSize} }`);
 			page.drawText(line, { x, y, size: fontSize, maxWidth: width, font: this.ubuntu, lineHeight: fontSize });
@@ -132,6 +162,7 @@ export class BallotPrinter {
 		let rect = rect0.shrinkByPadding(5);
 		console.log(rect.toString());
 
+		// image
 		const imageWidth = mm2dpt(25);
 		const imageHeight = (this.image!.height / this.image!.width) * imageWidth;
 
@@ -142,21 +173,33 @@ export class BallotPrinter {
 			height: imageHeight
 		});
 
-		const text = `Stimmzettel zum ${this.printSettings.veranstaltung} von ${this.printSettings.verbandName}`;
-		rect = rect.shrinkFromTop(this.drawText(page, text, 14, rect.shrinkFromRight(dpt2mm(imageWidth))).y);
+		// ballot id
+		const idX = dpt2mm(page.getWidth() - (mm2dpt(rect.left()) + imageWidth));
+		const idY = rect.top() + dpt2mm(imageHeight) + 3;
+		const idWidth = dpt2mm(imageWidth);
+		const idHeight = 5;
 
-		rect = rect.shrinkFromTop(10);
+		this.drawText(page, this.ballotId, 9, new Rect(new Vector2D(idX, idY), new Vector2D(idWidth, idHeight)));
+
+		// title
+		const text = `Stimmzettel zum ${this.printSettings.veranstaltung} von ${this.printSettings.verbandName}`;
+		rect = rect.shrinkFromTop(this.drawText(page, text, 14, rect.shrinkFromRight(dpt2mm(imageWidth) + 10)).y);
+
+
+		// votes
+		const voteSpacing = 5;
+		rect = rect.shrinkFromTop(voteSpacing);
+
+		const explanationOffset = 3;
 
 		for (const vote of this.printSettings.votes) {
 
 			const text = `Wahl zur*zum ${vote.config.toElect} von ${this.printSettings.verbandName}`;
-
-			rect = rect.shrinkFromTop(this.drawText(page, text, 14, rect).y);
-
+			rect = rect.shrinkFromTop(this.drawText(page, text, 14, rect).y + explanationOffset);
 
 			switch (vote.system) {
 				case "ew":
-					this.renderEw(page, vote, rect);
+					rect = rect.shrinkFromTop(this.renderEw(page, vote, rect));
 					break;
 				case "vew":
 					break;
@@ -168,29 +211,36 @@ export class BallotPrinter {
 					break;
 			}
 
-			console.log(rect.toString());
+			rect = rect.shrinkFromTop(voteSpacing);
 		}
 
 		console.log(rect.toString());
 		return rect;
 	}
 
-	renderEw(page: PDFPage, vote: Vote, rect0: Rect) {
+	renderTitle(page: PDFPage, text: string, voteCountText: string, rect0: Rect): number {
+		let rect = rect0;
+		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
+		rect = rect.shrinkFromTop(5);
+		rect = rect.shrinkFromTop(this.drawText(page, voteCountText, 14, rect).y);
+		rect = rect.shrinkFromTop(5);
 
+		return rect0.height() - rect.height();
+	}
+
+	renderEw(page: PDFPage, vote: Vote, rect0: Rect): number {
 		let rect = rect0;
 
-		const text = `Gewählt wird nach ${vote.config.referenz} in Verbindung mit § 19 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist wer mehr als 50 % der Stimmen erhält. Enthaltungen werden durch Freilassen der Felder gekennzeichnet und werden als Nicht abgegebene Stimmen gezählt.`;
+		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 19 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist derjenige mit über 50% der Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
 		const text2 = `Sie haben 1 Stimme`;
-
-		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
-		rect = rect.shrinkFromTop(this.drawText(page, text2, 14, rect).y);
+		rect = rect.shrinkFromTop(this.renderTitle(page, text, text2, rect));
 
 		const black = componentsToColor([0, 0, 0]);
 
-		const nameSize = 15;
+		const nameSize = 12;
 		const fontSize = 14;
 		const boxOffset = 5;
-		const boxSize = 7;
+		const boxSize = 6;
 		const leftOffset = boxOffset + boxSize + boxOffset;
 
 		for (const name of vote.config.namen) {
@@ -213,5 +263,7 @@ export class BallotPrinter {
 
 			rect = rect.shrinkFromTop(nameSize);
 		}
+
+		return rect0.height() - rect.height();
 	}
 }

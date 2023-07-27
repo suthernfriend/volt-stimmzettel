@@ -13,9 +13,7 @@ export const defaultConfiguration: VoteConfiguration = {
 	namen: [
 		"Craig Juarez",
 		"Jayla Hagan",
-		"Kristen Carreon",
-		"Nikki Cleary",
-		"Daryl Pinto"
+		"Kristen Carreon"
 	],
 	referenz: "§ 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 };
