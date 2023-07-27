@@ -4,7 +4,7 @@ import { Rect } from "@/lib/Rect";
 import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
 import ubuntuRegularUrl from "@/assets/Ubuntu-Regular.ttf?url";
-import logoUrl from "@/assets/logo.png?url";
+import logoUrl from "@/assets/logo-dark.png?url";
 import fontkit from "@pdf-lib/fontkit";
 import axios from "axios";
 import type { Vote } from "@/lib/Vote";
@@ -159,7 +159,7 @@ export class BallotPrinter {
 	private async printBallot(page: PDFPage, rect0: Rect): Promise<Rect> {
 
 		console.log(rect0.toString());
-		let rect = rect0.shrinkByPadding(5);
+		let rect = rect0.shrinkByPadding(10);
 		console.log(rect.toString());
 
 		// image
@@ -175,11 +175,21 @@ export class BallotPrinter {
 
 		// ballot id
 		const idX = dpt2mm(page.getWidth() - (mm2dpt(rect.left()) + imageWidth));
-		const idY = rect.top() + dpt2mm(imageHeight) + 3;
+		const idY = rect.top() + dpt2mm(imageHeight);
 		const idWidth = dpt2mm(imageWidth);
 		const idHeight = 5;
+		const idFontSize = 9;
 
-		this.drawText(page, this.ballotId, 9, new Rect(new Vector2D(idX, idY), new Vector2D(idWidth, idHeight)));
+		const idFontWidth = this.ubuntu!.widthOfTextAtSize(this.ballotId, idFontSize);
+		const idFontHeight = this.ubuntu!.heightAtSize(idFontSize);
+		page.drawText(this.ballotId, {
+			x: mm2dpt(rect.right() - dpt2mm(idFontWidth)),
+			y: page.getHeight() - mm2dpt(rect.top() + dpt2mm(imageHeight) + dpt2mm(idFontHeight)),
+			font: this.ubuntu,
+			size: idFontSize
+		});
+
+		// this.drawText(page, this.ballotId, 9, new Rect(new Vector2D(idX, idY), new Vector2D(idWidth, idHeight)));
 
 		// title
 		const text = `Stimmzettel zum ${this.printSettings.veranstaltung} von ${this.printSettings.verbandName}`;
@@ -202,6 +212,7 @@ export class BallotPrinter {
 					rect = rect.shrinkFromTop(this.renderEw(page, vote, rect));
 					break;
 				case "vew":
+					rect = rect.shrinkFromTop(this.renderVew(page, vote, rect));
 					break;
 				case "que":
 					break;
@@ -218,46 +229,73 @@ export class BallotPrinter {
 		return rect;
 	}
 
-	renderTitle(page: PDFPage, text: string, voteCountText: string, rect0: Rect): number {
+	renderTitle(page: PDFPage, text: string, voteCountText: string, rect0: Rect, boxOffset: number, boxSize: number): number {
 		let rect = rect0;
 		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
 		rect = rect.shrinkFromTop(5);
-		rect = rect.shrinkFromTop(this.drawText(page, voteCountText, 14, rect).y);
+
+		const black = componentsToColor([0, 0, 0]);
+
+		const sizeMM = boxSize + 2;
+
+		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+			x: mm2dpt(rect.left() + (8 - sizeMM / 2)),
+			y: page.getHeight() - mm2dpt(rect.top()),
+			borderColor: black,
+			scale: sizeMM / dpt2mm(48),
+			borderWidth: mm2dpt(1)
+		});
+
+		const leftOffset = boxOffset + boxSize + boxOffset;
+		rect = rect.shrinkFromTop(this.drawText(page, voteCountText, 14, rect.shrinkFromLeft(leftOffset)).y);
 		rect = rect.shrinkFromTop(5);
 
 		return rect0.height() - rect.height();
 	}
 
-	renderEw(page: PDFPage, vote: Vote, rect0: Rect): number {
-		let rect = rect0;
+	drawCheckbox(page: PDFPage, rect: Rect, nameSize: number, boxOffset: number, boxSize: number): void {
+		const black = componentsToColor([0, 0, 0]);
+		const y = rect.top() + boxSize + ((nameSize - boxSize) / 2);
+		page.drawRectangle({
+			x: mm2dpt(rect.left() + boxOffset),
+			y: page.getHeight() - mm2dpt(y),
+			width: mm2dpt(boxSize),
+			height: mm2dpt(boxSize),
+			borderWidth: mm2dpt(0.5),
+			borderColor: black
+		});
+	}
 
+	renderVew(page: PDFPage, vote: Vote, rect0: Rect): number {
+		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist sind die ${vote.config.anzahlAemter} Bewerber*innen mit den meisten Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
+		const text2 = `Sie haben ${vote.config.anzahlAemter} Stimme${vote.config.anzahlAemter > 1 ? "n" : ""}`;
+		return this.renderEwAndVew(page, vote, rect0, text, text2);
+	}
+
+	renderEw(page: PDFPage, vote: Vote, rect0: Rect): number {
 		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 19 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist derjenige mit über 50% der Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
 		const text2 = `Sie haben 1 Stimme`;
-		rect = rect.shrinkFromTop(this.renderTitle(page, text, text2, rect));
+		return this.renderEwAndVew(page, vote, rect0, text, text2);
+	}
+
+	renderEwAndVew(page: PDFPage, vote: Vote, rect0: Rect, text: string, countText: string): number {
+		let rect = rect0;
 
 		const black = componentsToColor([0, 0, 0]);
-
 		const nameSize = 12;
 		const fontSize = 14;
 		const boxOffset = 5;
 		const boxSize = 6;
 		const leftOffset = boxOffset + boxSize + boxOffset;
 
+		rect = rect.shrinkFromTop(this.renderTitle(page, text, countText, rect, boxOffset, boxSize));
+
 		for (const name of vote.config.namen) {
 
-			const y = rect.top() + boxSize + ((nameSize - boxSize) / 2);
-
-			page.drawRectangle({
-				x: mm2dpt(rect.left() + boxOffset),
-				y: page.getHeight() - mm2dpt(y),
-				width: mm2dpt(boxSize),
-				height: mm2dpt(boxSize),
-				borderWidth: mm2dpt(0.5),
-				borderColor: black
-			});
+			this.drawCheckbox(page, rect, nameSize, boxOffset, boxSize);
 
 			this.drawText(page, name, fontSize, new Rect(
-				new Vector2D(rect.left() + leftOffset, rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1),
+				new Vector2D(rect.left() + leftOffset, rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5),
 				new Vector2D(rect.width() - leftOffset, dpt2mm(fontSize)))
 			);
 

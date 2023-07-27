@@ -7,7 +7,7 @@ export interface VoteConfiguration {
 }
 
 export const defaultConfiguration: VoteConfiguration = {
-	toElect: "Vorsitzender",
+	toElect: "Vorsitzenden",
 	hoechstePunktzahl: 10,
 	anzahlAemter: 3,
 	namen: [

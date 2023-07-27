@@ -8,7 +8,7 @@ import { BallotPrinter } from "@/lib/BallotPrinter";
 const config = ref<PrintSettings>({
 	pageSize: "A4",
 	votes: [],
-	veranstaltung: "12. ordentliche Bundesparteitag",
+	veranstaltung: "12. ordentlichen Bundesparteitag",
 	ballotsPerPage: 2,
 	verbandName: "Volt Deutschland"
 });
@@ -35,7 +35,6 @@ watch(config, () => {
 </script>
 
 <template>
-	{{ config }}
 	<nav class="navbar is-primary">
 		<div class="container">
 			<div class="navbar-brand">
@@ -56,6 +55,14 @@ watch(config, () => {
 			</div>
 		</main>
 	</div>
+	<footer class="footer">
+		<div class="content has-text-centered">
+			<p>
+				<strong>Volt Stimmzettel Tool</strong> made with &hearts; by
+				<a href="https://volteuropa.workplace.com/profile.php?id=100042980760731">Jan Peter König</a>.
+			</p>
+		</div>
+	</footer>
 </template>
 
 <style scoped>
