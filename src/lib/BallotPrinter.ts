@@ -4,7 +4,7 @@ import { Rect } from "@/lib/Rect";
 import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
 import ubuntuRegularUrl from "@/assets/Ubuntu-Regular.ttf?url";
-import logoUrl from "@/assets/logo2.png?url";
+import logoUrl from "@/assets/logo.png?url";
 import fontkit from "@pdf-lib/fontkit";
 import axios from "axios";
 import type { Vote } from "@/lib/Vote";

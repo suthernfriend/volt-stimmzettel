@@ -26,8 +26,8 @@ const veranstaltung = ref<string>(props.modelValue.veranstaltung);
 const newVotingSystem = ref<VotingSystemKey>("ew");
 const votes = reactive(props.modelValue.votes);
 
-watch([votes, verbandName, ballotsPerPage, pageSize], (value) => {
-	const [votes, verbandName, ballotsPerPage, pageSize] = value;
+watch([votes, verbandName, ballotsPerPage, veranstaltung, pageSize], (value) => {
+	const [votes, verbandName, ballotsPerPage, veranstaltung, pageSize] = value;
 	const bpp = parseInt(ballotsPerPage);
 
 	console.log(`votes: ${votes.length}, verbandName: ${verbandName}, ballotsPerPage: ${ballotsPerPage}, pageSize: ${pageSize}`);
@@ -89,7 +89,8 @@ async function reset() {
 			<div class="column is-three-fifths">
 				<div class="field">
 					<label class="label">Veranstaltung</label>
-					<input v-model="veranstaltung" type="text" class="input" placeholder="Name des Verbands: z.B. 8. ordentlichen Landesparteitag">
+					<input v-model="veranstaltung" type="text" class="input"
+								 placeholder="Name des Verbands: z.B. 8. ordentlichen Landesparteitag">
 				</div>
 			</div>
 		</div>
