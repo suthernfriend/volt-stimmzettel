@@ -215,6 +215,7 @@ export class BallotPrinter {
 					rect = rect.shrinkFromTop(this.renderVew(page, vote, rect));
 					break;
 				case "que":
+					rect = rect.shrinkFromTop(this.renderQue(page, vote, rect));
 					break;
 				case "borda":
 					break;
@@ -229,41 +230,102 @@ export class BallotPrinter {
 		return rect;
 	}
 
-	renderTitle(page: PDFPage, text: string, voteCountText: string, rect0: Rect, boxOffset: number, boxSize: number): number {
-		let rect = rect0;
-		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
-		rect = rect.shrinkFromTop(5);
-
-		const black = componentsToColor([0, 0, 0]);
-
-		const sizeMM = boxSize + 2;
-
-		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
-			x: mm2dpt(rect.left() + (8 - sizeMM / 2)),
-			y: page.getHeight() - mm2dpt(rect.top()),
-			borderColor: black,
-			scale: sizeMM / dpt2mm(48),
-			borderWidth: mm2dpt(1)
-		});
-
-		const leftOffset = boxOffset + boxSize + boxOffset;
-		rect = rect.shrinkFromTop(this.drawText(page, voteCountText, 14, rect.shrinkFromLeft(leftOffset)).y);
-		rect = rect.shrinkFromTop(5);
-
-		return rect0.height() - rect.height();
-	}
-
-	drawCheckbox(page: PDFPage, rect: Rect, nameSize: number, boxOffset: number, boxSize: number): void {
+	drawCheckbox(page: PDFPage, rect: Rect, nameSize: number, boxSize: number): void {
 		const black = componentsToColor([0, 0, 0]);
 		const y = rect.top() + boxSize + ((nameSize - boxSize) / 2);
 		page.drawRectangle({
-			x: mm2dpt(rect.left() + boxOffset),
+			x: mm2dpt(rect.left()),
 			y: page.getHeight() - mm2dpt(y),
 			width: mm2dpt(boxSize),
 			height: mm2dpt(boxSize),
 			borderWidth: mm2dpt(0.5),
 			borderColor: black
 		});
+	}
+
+	renderQue(page: PDFPage, vote: Vote, rect0: Rect): number {
+
+		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz}. Zum nächsten Wahlgang zugelassen sind alle Bewerber*innen, die mehr Ja- als Nein-Stimmen erhalten. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
+		const countText = `Sie haben jeweils 1 Stimme`;
+		const betweenText = `oder`;
+
+		let rect = rect0;
+
+		const black = componentsToColor([0, 0, 0]);
+		const nameSize = 12;
+		const fontSize = 14;
+		const boxOffset = 5;
+		const boxSize = 6;
+		const leftOffset = boxOffset + boxSize + boxOffset;
+
+		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
+		rect = rect.shrinkFromTop(5);
+
+		const sizeMM = boxSize + 2;
+
+		const yesNoWidth = 25;
+		const totalWidth = yesNoWidth + yesNoWidth;
+		const yesX = rect.right() - totalWidth;
+		const noX = yesX + yesNoWidth;
+
+		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+			// x: mm2dpt(yesX + (8 - sizeMM / 2)),
+			x: mm2dpt(yesX - 1.1),
+			y: page.getHeight() - mm2dpt(rect.top()),
+			borderColor: black,
+			scale: sizeMM / dpt2mm(48),
+			borderWidth: mm2dpt(1)
+		});
+
+		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+			x: mm2dpt(noX - 1.1),
+			y: page.getHeight() - mm2dpt(rect.top()),
+			borderColor: black,
+			scale: sizeMM / dpt2mm(48),
+			borderWidth: mm2dpt(1)
+		});
+
+		let y = this.drawText(page, countText, 14, rect).y;
+
+		this.drawText(page, betweenText, 14, new Rect(
+			new Vector2D(yesX + boxSize + boxOffset + (-0.7), rect.top()),
+			new Vector2D(rect.width(), dpt2mm(fontSize))
+		));
+
+		rect = rect.shrinkFromTop(y + 5);
+
+
+		for (const name of vote.config.namen) {
+
+			const textY = rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5;
+
+			this.drawText(page, name, fontSize, new Rect(
+				new Vector2D(rect.left(), textY),
+				new Vector2D(rect.width() / 2, dpt2mm(fontSize)))
+			);
+
+			this.drawCheckbox(page, new Rect(
+				new Vector2D(yesX, rect.top()),
+				new Vector2D(yesNoWidth, rect.height())
+			), nameSize, boxSize);
+			this.drawText(page, "Ja", fontSize, new Rect(
+				new Vector2D(yesX + boxSize + boxOffset, textY),
+				new Vector2D(yesNoWidth - boxSize, rect.height())
+			));
+
+			this.drawCheckbox(page, new Rect(
+				new Vector2D(noX, rect.top()),
+				new Vector2D(yesNoWidth, rect.height())
+			), nameSize, boxSize);
+			this.drawText(page, "Nein", fontSize, new Rect(
+				new Vector2D(noX + boxSize + boxOffset, textY),
+				new Vector2D(yesNoWidth - boxSize, rect.height())
+			));
+
+			rect = rect.shrinkFromTop(nameSize);
+		}
+
+		return rect0.height() - rect.height();
 	}
 
 	renderVew(page: PDFPage, vote: Vote, rect0: Rect): number {
@@ -288,11 +350,25 @@ export class BallotPrinter {
 		const boxSize = 6;
 		const leftOffset = boxOffset + boxSize + boxOffset;
 
-		rect = rect.shrinkFromTop(this.renderTitle(page, text, countText, rect, boxOffset, boxSize));
+		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
+		rect = rect.shrinkFromTop(5);
+
+		const sizeMM = boxSize + 2;
+
+		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+			x: mm2dpt(rect.left() + (8 - sizeMM / 2)),
+			y: page.getHeight() - mm2dpt(rect.top()),
+			borderColor: black,
+			scale: sizeMM / dpt2mm(48),
+			borderWidth: mm2dpt(1)
+		});
+
+		rect = rect.shrinkFromTop(this.drawText(page, countText, 14, rect.shrinkFromLeft(leftOffset)).y);
+		rect = rect.shrinkFromTop(5);
 
 		for (const name of vote.config.namen) {
 
-			this.drawCheckbox(page, rect, nameSize, boxOffset, boxSize);
+			this.drawCheckbox(page, rect.shrinkFromLeft(boxOffset), nameSize, boxSize);
 
 			this.drawText(page, name, fontSize, new Rect(
 				new Vector2D(rect.left() + leftOffset, rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5),
