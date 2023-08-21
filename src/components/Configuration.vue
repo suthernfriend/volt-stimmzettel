@@ -24,16 +24,22 @@ const verbandName = ref<string>(props.modelValue.verbandName);
 const veranstaltung = ref<string>(props.modelValue.veranstaltung);
 const newVotingSystem = ref<VotingSystemKey>("ew");
 const votes = reactive(props.modelValue.votes);
+const zkLeitung = ref<string>(props.modelValue.zkLeitung);
+const zkMitgliedEins = ref<string>(props.modelValue.zkMitgliedEins);
+const zkMitgliedZwei = ref<string>(props.modelValue.zkMitgliedZwei);
 
-watch([votes, verbandName, veranstaltung, ballotType], (value) => {
-	const [votes, verbandName, veranstaltung, ballotType] = value;
+watch([votes, verbandName, veranstaltung, ballotType, zkLeitung, zkMitgliedEins, zkMitgliedZwei], (value) => {
+	const [votes, verbandName, veranstaltung, ballotType, zkLeitung, zkMitgliedEins, zkMitgliedZwei] = value;
 
 	console.log(`votes: ${votes.length}, verbandName: ${verbandName}, ballotType: ${ballotType}`);
 	emit("update:modelValue", {
 		ballotType,
 		verbandName,
 		veranstaltung,
-		votes
+		votes,
+		zkLeitung,
+		zkMitgliedEins,
+		zkMitgliedZwei
 	});
 }, { deep: true });
 
@@ -86,6 +92,26 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 					<label class="label">Veranstaltung</label>
 					<input v-model="veranstaltung" type="text" class="input"
 								 placeholder="Name der Veranstaltung: z.B. 8. ordentlichen Landesparteitag">
+				</div>
+			</div>
+			<div class="column">
+				<div class="field">
+					<label class="label">Leiter der Zählkommission</label>
+					<input v-model="zkLeitung" type="text" class="input" placeholder="Name z.B. 'Johnny Depp'">
+				</div>
+			</div>
+		</div>
+		<div class="columns">
+			<div class="column">
+				<div class="field">
+					<label class="label">Mitglied #1 der Zählkommission</label>
+					<input v-model="zkMitgliedEins" type="text" class="input" placeholder="Name z.B. 'Keira Kneightley'">
+				</div>
+			</div>
+			<div class="column">
+				<div class="field">
+					<label class="label">Mitglied #2 der Zählkommission</label>
+					<input v-model="zkMitgliedZwei" type="text" class="input" placeholder="Name. z.B. 'Geoffrey Rush'">
 				</div>
 			</div>
 		</div>

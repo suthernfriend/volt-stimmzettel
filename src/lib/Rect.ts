@@ -61,6 +61,13 @@ export class Rect {
 		);
 	}
 
+	shrinkFromTopWithRect(rect: Rect): Rect {
+		return new Rect(
+			this._topLeft.add(new Vector2D(0, rect.height())),
+			this._size.sub(new Vector2D(0, rect.height()))
+		);
+	}
+
 	shrinkFromLeft(by: number): Rect {
 		return new Rect(
 			this._topLeft.add(new Vector2D(by, 0)),
@@ -85,4 +92,5 @@ export class Rect {
 	toString(): string {
 		return `Rect(${this._topLeft}, ${this._size})`;
 	}
+
 }

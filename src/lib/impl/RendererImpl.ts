@@ -1,5 +1,5 @@
 import { Rect } from "@/lib/Rect";
-import type { Renderer } from "@/lib/Renderer";
+import type { DrawTextOrientation, Renderer } from "@/lib/Renderer";
 import type { Color, PDFFont, PDFImage, PDFPage } from "pdf-lib";
 import { componentsToColor } from "pdf-lib";
 import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
@@ -61,8 +61,8 @@ export class RendererImpl implements Renderer {
 		return rect;
 	}
 
-	drawHelpRect(rect: Rect, color: 0 | 1 | 2 | 3 | 4 | 5): void {
-
+	drawHelpRect(rect: Rect, color: number): void {
+		return;
 		const colors: Color[] = [
 			componentsToColor([1, 0, 0])!,
 			componentsToColor([0, 1, 0])!,
@@ -195,12 +195,13 @@ export class RendererImpl implements Renderer {
 		return rect;
 	}
 
-	drawText(text: string, rect: Rect, fontSize?: number, lineHeight?: number): Rect {
+	drawText(text: string, rect: Rect, fontSize?: number, lineHeight?: number, orientation?: DrawTextOrientation): Rect {
 
-		this.drawHelpRect(rect, 2);
+		this.drawHelpRect(rect, 1);
 
 		lineHeight = lineHeight ?? 1.1;
 		fontSize = fontSize ?? 10;
+		orientation = orientation ?? "left";
 
 		const fontHeight = dpt2mm(this.options.font.heightAtSize(fontSize));
 
@@ -220,22 +221,33 @@ export class RendererImpl implements Renderer {
 		}
 		lines.push(current);
 
-		const totalLinesHeight = lines.length * fontHeight * lineHeight;
+		const singleLineHeight = fontHeight * lineHeight;
+		const totalLinesHeight = lines.length * singleLineHeight;
 
 		if (totalLinesHeight > rect.height())
 			throw new Error("Text does not fit into rect");
 
 		let maxWidth = 0;
 		let y = 0;
+		let i = 1;
 		for (const line of lines) {
+
+			let left = rect.left();
+			if (orientation === "center")
+				left = rect.left() + (rect.width() - dpt2mm(this.options.font.widthOfTextAtSize(line, fontSize))) / 2;
+			else if (orientation === "right")
+				left = rect.left() + (rect.width() - dpt2mm(this.options.font.widthOfTextAtSize(line, fontSize)));
+			else if (orientation === "justified")
+				throw Error("Not implemented yet");
+
 			const lineRect = Rect.ofValues(
-				rect.left(), rect.top() + y,
-				rect.width(), totalLinesHeight
+				left, rect.top() + y,
+				rect.width(), singleLineHeight
 			);
 
 			const adjustedRect = this.translate(lineRect);
 
-			this.drawHelpRect(lineRect, 3);
+			this.drawHelpRect(lineRect, (i++) % 4);
 			this.options.page.drawText(line, {
 				x: adjustedRect.left(),
 				y: adjustedRect.top(),
@@ -254,7 +266,17 @@ export class RendererImpl implements Renderer {
 		return Rect.ofValues(rect.left(), rect.top(), maxWidth, y);
 	}
 
-	drawTextJustified(text: string, rect: Rect, fontSize: number): Rect {
-		return rect;
+	drawLine(start: Vector2D, end: Vector2D, thinkness: number) {
+
+		const translatedStart = this.translate(Rect.ofValues(start.x, start.y, 1, 1));
+		const translatedEnd = this.translate(Rect.ofValues(end.x, end.y, 1, 1));
+
+		this.options.page.drawLine({
+			start: { x: translatedStart.left(), y: translatedStart.top() },
+			end: { x: translatedEnd.left(), y: translatedEnd.top() },
+			color: componentsToColor([0, 0, 0]),
+			thickness: mm2dpt(thinkness)
+		});
+
 	}
 }

@@ -6,12 +6,16 @@ import Configuration from "@/components/Configuration.vue";
 import { Printer } from "@/lib/Printer";
 import { BallotTypes } from "@/lib/config/BallotTypes";
 import { RandomStringProviderImpl } from "@/lib/impl/RandomStringProviderImpl";
+import { VotePrintInstructionsFactory } from "@/lib/instructions/VotePrintInstructionsFactory";
 
 const config = ref<PrintSettings>({
-	ballotType: "A4_1_Extended",
+	ballotType: "A4_2",
 	votes: [],
 	veranstaltung: "12. ordentlichen Bundesparteitag",
-	verbandName: "Volt Deutschland"
+	verbandName: "Volt Deutschland",
+	zkLeitung: "Max Mustermann",
+	zkMitgliedEins: "Tina Müller",
+	zkMitgliedZwei: "Hans Meier"
 });
 
 const errorMessage = ref("");
@@ -19,13 +23,31 @@ const documentUrl = ref("");
 
 async function updateBallot() {
 
+	const provider = new RandomStringProviderImpl();
+	const ballotId = provider.randomString(8);
+
 	const printer = new Printer({
 		ballotType: BallotTypes[config.value.ballotType],
-		randomStringProvider: new RandomStringProviderImpl()
+		randomStringProvider: new RandomStringProviderImpl(),
+		veranstaltung: config.value.veranstaltung,
+		verbandName: config.value.verbandName,
+		ballotId,
+		zkNames: [
+			config.value.zkMitgliedEins,
+			`${config.value.zkLeitung} (Leitung)`,
+			config.value.zkMitgliedZwei
+		]
 	});
 
+	const factory = new VotePrintInstructionsFactory();
+
 	try {
-		documentUrl.value = await printer.print();
+
+		const instructions = await Promise.all(
+			config.value.votes.map(vote => factory.fromVote(vote))
+		);
+
+		documentUrl.value = await printer.printResultPage(instructions);
 		errorMessage.value = "";
 	} catch (e: any) {
 		errorMessage.value = e.message;

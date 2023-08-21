@@ -5,7 +5,7 @@ export class RandomStringProviderImpl implements RandomStringProvider {
 		const firstAlphabet = "CFGHJKLMNPRTVWXYZ";
 		const alphabet = "1234567890CFGHJKLMNPRTVWXYZ";
 		let result = firstAlphabet[Math.floor(Math.random() * firstAlphabet.length)];
-		for (let i = 1; i < len; i++) {
+		for (let i = 1; i < length; i++) {
 			result += alphabet[Math.floor(Math.random() * alphabet.length)];
 		}
 		return result;

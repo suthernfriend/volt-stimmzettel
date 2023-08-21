@@ -16,7 +16,7 @@ export function createDefaultConfiguration(): VoteConfiguration {
 		hoechstePunktzahl: 10,
 		anzahlAemter: 3,
 		candidateInfos: [
-			// { vorname: "Craig", nachname: "Juarez", listenplatz: 0 },
+			{ vorname: "Craig", nachname: "Juarez", listenplatz: 0 },
 		],
 		referenz: "§ 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 	};
