@@ -1,63 +1,57 @@
-import type { PrintSettings } from "@/lib/PrintSettings";
+import type { PrintSettings } from "@/lib/config/PrintSettings";
 import { componentsToColor, PageSizes, PDFDocument, PDFFont, PDFImage, PDFPage } from "pdf-lib";
 import { Rect } from "@/lib/Rect";
 import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
-import ubuntuRegularUrl from "@/assets/Ubuntu-Regular.ttf?url";
-import logoUrl from "@/assets/logo-dark.png?url";
 import fontkit from "@pdf-lib/fontkit";
 import axios from "axios";
 import type { Vote } from "@/lib/Vote";
+import type { VotingSystemKey } from "@/lib/VotingSystemKey";
+import type { CandidateInfo } from "@/lib/CandidateInfo";
+import { RendererImpl } from "@/lib/impl/RendererImpl";
 
 type PageSetupSize = (page: PDFPage) => number[][];
 type HelpLines = (page: PDFPage) => number[][];
 
-const pageSizes: { A4: { [k: number]: [number, number] } } = {
-	A4: {
-		1: PageSizes.A4,
-		2: [PageSizes.A4[1], PageSizes.A4[0]],
-		4: PageSizes.A4
-	}
-};
+const arrowDownSvgPath = "M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z";
 
-const helpLines: { A4: { [k: number]: HelpLines } } = {
-	A4: {
-		1: (page: PDFPage) => [],
-		2: (page: PDFPage) => {
-			return [
-				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight()]
-			];
-		},
-		4: (page: PDFPage) => {
-			return [
-				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight()],
-				[0, page.getHeight() / 2, page.getWidth(), page.getHeight() / 2]
-			];
-		}
-	}
-};
-
-const pageSetup: { A4: { 1: PageSetupSize, 2: PageSetupSize, 4: PageSetupSize } } = {
-	A4: {
-		1: (page: PDFPage) => {
-			return [
-				[0, 0, page.getWidth(), page.getHeight()]
-			];
-		},
-		2: (page: PDFPage) => {
-			return [
-				[0, 0, page.getWidth() / 2, page.getHeight()],
-				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight()]
-			];
-		},
-		4: (page: PDFPage) => {
-			return [
-				[0, 0, page.getWidth() / 2, page.getHeight() / 2],
-				[page.getWidth() / 2, 0, page.getWidth() / 2, page.getHeight() / 2],
-				[0, page.getHeight() / 2, page.getWidth() / 2, page.getHeight() / 2],
-				[page.getWidth() / 2, page.getHeight() / 2, page.getWidth() / 2, page.getHeight() / 2]
-			];
-		}
+const voteTexts: Record<VotingSystemKey, {
+	explanation: (vote: Vote) => string;
+	youHaveInfo: (vote: Vote) => string;
+}> = {
+	ew: {
+		explanation: vote => `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 20 der Allgemeinen Wahlordnung von `
+			+ `Volt Deutschland. Gewählt ist sind die ${vote.config.anzahlAemter} Bewerber*innen mit den meisten Stimmen. `
+			+ `Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`,
+		youHaveInfo: vote => `Sie haben ${vote.config.anzahlAemter} Stimme${vote.config.anzahlAemter > 1 ? "n" : ""}`
+	},
+	que: {
+		explanation: vote => `Die Wahl erfolgt gemäß ${vote.config.referenz}. Zum nächsten Wahlgang zugelassen sind alle `
+			+ `Bewerber*innen, die mehr Ja- als Nein-Stimmen erhalten. Enthaltungen gelten als nicht abgegebene Stimmen und `
+			+ `werden durch leere Felder angezeigt.`,
+		youHaveInfo: vote => `Sie haben jeweils 1 Stimme`
+	},
+	vew: {
+		explanation: vote => `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 20 der Allgemeinen Wahlordnung von Volt `
+			+ `Deutschland. Gewählt sind die ${vote.config.anzahlAemter} Bewerber*innen mit den meisten Stimmen. `
+			+ `Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`,
+		youHaveInfo: vote => `Sie haben ${vote.config.anzahlAemter} Stimmen`
+	},
+	borda: {
+		explanation: vote => `Die Wahl erfolgt gemäß ${vote.config.referenz}. Jedem Bewerber kann dabei eine Punktzahl `
+			+ `zwischen 1 und ${vote.config.hoechstePunktzahl} vergeben werden, dabei darf keine Punktzahl doppelt vergeben werden. `
+			+ `Die ${vote.config.anzahlAemter} Bewerber*innen mit den höchsten Punktzahlen sind gewählt. Enthaltungen gelten `
+			+ `als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`,
+		youHaveInfo: vote => `Sie können jede Punktzahl von 1 bis ${vote.config.hoechstePunktzahl} einmal vergeben`
+	},
+	star: {
+		explanation: vote => `Die Wahl erfolgt gemäß § 23 der Allgemeinen Wahlordnung von Volt Deutschland. Jedem `
+			+ `Bewerber kann dabei eine Punktzahl zwischen 0 und ${vote.config.hoechstePunktzahl} vergeben werden. Punktzahlen können `
+			+ `mehrfach vergeben werden. Die Reihenfolge ergibt sich durch den Mittelwert der vergebenen Punktzahlen, wobei die `
+			+ `Bewerber jeweils nochmal im direkten Vergleich verglichen werden. Enthaltungen werden als nicht abgegebene Stimmen `
+			+ `gezählt und werden durch leere Felder angezeigt. Bewerber die von mehr als der Hälfte der Stimmberechtigten mit 0 `
+			+ `Punkten bewertet werden, sind nicht für die Liste zugelassen.`,
+		youHaveInfo: vote => `Sie können bei jedem Bewerber eine Bewertung von 0 bis ${vote.config.hoechstePunktzahl} vergeben.`
 	}
 };
 
@@ -69,16 +63,6 @@ export class BallotPrinter {
 	constructor(private printSettings: PrintSettings) {
 		console.log(this.printSettings);
 		this.ballotId = this.randomIDString(8);
-	}
-
-	private randomIDString(len: number): string {
-		const firstAlphabet = "CFGHJKLMNPRTVWXYZ";
-		const alphabet = "1234567890CFGHJKLMNPRTVWXYZ";
-		let result = firstAlphabet[Math.floor(Math.random() * firstAlphabet.length)];
-		for (let i = 1; i < len; i++) {
-			result += alphabet[Math.floor(Math.random() * alphabet.length)];
-		}
-		return result;
 	}
 
 	private async loadAssets(pdfDoc: PDFDocument) {
@@ -101,13 +85,43 @@ export class BallotPrinter {
 		const xywhs = pageSetup[this.printSettings.pageSize][this.printSettings.ballotsPerPage](page);
 
 		for (const xywh of xywhs) {
-			console.log(xywh.toString());
-			await this.printBallot(page, new Rect(
+
+			const pageArea = new Rect(
 				new Vector2D(dpt2mm(xywh[0]), dpt2mm(xywh[1])),
 				new Vector2D(dpt2mm(xywh[2]), dpt2mm(xywh[3]))
-			));
+			);
+
+			await this.printTestRenderer(page, pageArea);
+			//
+			// await this.printBallot(page, new Rect(
+			// 	new Vector2D(dpt2mm(xywh[0]), dpt2mm(xywh[1])),
+			// 	new Vector2D(dpt2mm(xywh[2]), dpt2mm(xywh[3]))
+			// ));
 		}
 		return await pdfDoc.saveAsBase64({ dataUri: true });
+	}
+
+	private printTestRenderer(page: PDFPage, area: Rect) {
+		const renderer = new RendererImpl({
+			page: page,
+			font: this.ubuntu!,
+			images: {
+				"logo-dark": this.image!
+			},
+			area
+		});
+
+		for (let i = 0; i < dpt2mm(page.getWidth()); i += 10) {
+			renderer.drawTextLineVerticallyCentered(`${i}`, Rect.ofValues(i, 0, 10, 5), 8);
+		}
+
+		for (let i = 0; i < dpt2mm(page.getHeight()); i += 10) {
+			renderer.drawTextLineVerticallyCentered(`${i}`, Rect.ofValues(0, i, 10, 5), 8);
+		}
+
+		renderer.drawImage("logo-dark", Rect.ofValues(10, 10, 40, 20));
+
+		renderer.drawCheckboxAndText("Orlando Bloom", Rect.ofValues(10, 20, 120, 20), 5);
 	}
 
 	private async printVote(rect: Rect): Promise<Rect> {
@@ -174,12 +188,7 @@ export class BallotPrinter {
 		});
 
 		// ballot id
-		const idX = dpt2mm(page.getWidth() - (mm2dpt(rect.left()) + imageWidth));
-		const idY = rect.top() + dpt2mm(imageHeight);
-		const idWidth = dpt2mm(imageWidth);
-		const idHeight = 5;
 		const idFontSize = 9;
-
 		const idFontWidth = this.ubuntu!.widthOfTextAtSize(this.ballotId, idFontSize);
 		const idFontHeight = this.ubuntu!.heightAtSize(idFontSize);
 		page.drawText(this.ballotId, {
@@ -218,8 +227,10 @@ export class BallotPrinter {
 					rect = rect.shrinkFromTop(this.renderQue(page, vote, rect));
 					break;
 				case "borda":
+					rect = rect.shrinkFromTop(this.renderBorda(page, vote, rect));
 					break;
 				case "star":
+					rect = rect.shrinkFromTop(this.renderStar(page, vote, rect));
 					break;
 			}
 
@@ -231,7 +242,6 @@ export class BallotPrinter {
 	}
 
 	drawCheckbox(page: PDFPage, rect: Rect, nameSize: number, boxSize: number): void {
-		const black = componentsToColor([0, 0, 0]);
 		const y = rect.top() + boxSize + ((nameSize - boxSize) / 2);
 		page.drawRectangle({
 			x: mm2dpt(rect.left()),
@@ -243,12 +253,27 @@ export class BallotPrinter {
 		});
 	}
 
-	renderQue(page: PDFPage, vote: Vote, rect0: Rect): number {
+	sortCandidateInfo(raw: CandidateInfo[], byListenplatzFirst: boolean): CandidateInfo[] {
+		const infos = [...raw];
+		if (byListenplatzFirst) {
+			infos.sort((a: CandidateInfo, b: CandidateInfo) => {
+				const lp = a.listenplatz - b.listenplatz;
+				if (lp !== 0)
+					return lp;
+				const nc = a.nachname.localeCompare(b.nachname);
+				return nc !== 0 ? nc : a.vorname.localeCompare(b.vorname);
+			});
+		} else {
+			infos.sort((a: CandidateInfo, b: CandidateInfo) => {
+				const nc = a.nachname.localeCompare(b.nachname);
+				return nc !== 0 ? nc : a.vorname.localeCompare(b.vorname);
+			});
+		}
 
-		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz}. Zum nächsten Wahlgang zugelassen sind alle Bewerber*innen, die mehr Ja- als Nein-Stimmen erhalten. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
-		const countText = `Sie haben jeweils 1 Stimme`;
-		const betweenText = `oder`;
+		return infos;
+	}
 
+	renderBorda(page: PDFPage, vote: Vote, rect0: Rect): number {
 		let rect = rect0;
 
 		const black = componentsToColor([0, 0, 0]);
@@ -258,7 +283,88 @@ export class BallotPrinter {
 		const boxSize = 6;
 		const leftOffset = boxOffset + boxSize + boxOffset;
 
-		rect = rect.shrinkFromTop(this.drawText(page, text, 9, rect).y);
+		rect = rect.shrinkFromTop(this.drawText(page, voteTexts.borda.explanation(vote), 9, rect).y);
+		rect = rect.shrinkFromTop(5);
+
+		const lineWidth = 25;
+		const lineX = rect.right() - lineWidth;
+
+		let y = this.drawText(page, voteTexts.borda.youHaveInfo(vote), 14, rect).y;
+		rect = rect.shrinkFromTop(y + 5);
+
+		const candidates = this.sortCandidateInfo(vote.config.candidateInfos, false);
+
+		for (const name of vote.config.candidateInfos) {
+
+			const textY = rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5;
+
+			this.drawText(page, `${name.vorname} ${name.nachname}`, fontSize, new Rect(
+				new Vector2D(rect.left(), textY),
+				new Vector2D(rect.width() / 2, dpt2mm(fontSize)))
+			);
+
+			page.drawLine({
+				start: { x: mm2dpt(lineX), y: page.getHeight() - mm2dpt(rect.top() + nameSize - 3) },
+				end: { x: mm2dpt(lineX + lineWidth), y: page.getHeight() - mm2dpt(rect.top() + nameSize - 3) }
+			});
+
+			rect = rect.shrinkFromTop(nameSize);
+		}
+
+		return rect0.height() - rect.height();
+	}
+
+	renderStar(page: PDFPage, vote: Vote, rect0: Rect): number {
+		let rect = rect0;
+
+		const black = componentsToColor([0, 0, 0]);
+		const nameSize = 12;
+		const fontSize = 14;
+		const boxOffset = 5;
+		const boxSize = 6;
+		const leftOffset = boxOffset + boxSize + boxOffset;
+
+		rect = rect.shrinkFromTop(this.drawText(page, voteTexts.star.explanation(vote), 9, rect).y);
+		rect = rect.shrinkFromTop(5);
+
+		const lineWidth = 25;
+		const lineX = rect.right() - lineWidth;
+
+		let y = this.drawText(page, voteTexts.star.youHaveInfo(vote), 14, rect).y;
+		rect = rect.shrinkFromTop(y + 5);
+
+		for (const name of vote.config.candidateInfos) {
+
+			const textY = rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5;
+
+			this.drawText(page, `${name.vorname} ${name.nachname}`, fontSize, new Rect(
+				new Vector2D(rect.left(), textY),
+				new Vector2D(rect.width() / 2, dpt2mm(fontSize)))
+			);
+
+			page.drawLine({
+				start: { x: mm2dpt(lineX), y: page.getHeight() - mm2dpt(rect.top() + nameSize - 3) },
+				end: { x: mm2dpt(lineX + lineWidth), y: page.getHeight() - mm2dpt(rect.top() + nameSize - 3) }
+			});
+
+			rect = rect.shrinkFromTop(nameSize);
+		}
+
+		return rect0.height() - rect.height();
+	}
+
+	renderQue(page: PDFPage, vote: Vote, rect0: Rect): number {
+		let rect = rect0;
+
+		const betweenText = `oder`;
+		const black = componentsToColor([0, 0, 0]);
+		const nameSize = 12;
+		const fontSize = 14;
+		const boxOffset = 5;
+		const boxSize = 6;
+		const leftOffset = boxOffset + boxSize + boxOffset;
+
+		rect = rect.shrinkFromTop(this.drawText(page, voteTexts.que.explanation(vote), 9, rect).y);
 		rect = rect.shrinkFromTop(5);
 
 		const sizeMM = boxSize + 2;
@@ -268,7 +374,7 @@ export class BallotPrinter {
 		const yesX = rect.right() - totalWidth;
 		const noX = yesX + yesNoWidth;
 
-		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+		page.drawSvgPath(arrowDownSvgPath, {
 			// x: mm2dpt(yesX + (8 - sizeMM / 2)),
 			x: mm2dpt(yesX - 1.1),
 			y: page.getHeight() - mm2dpt(rect.top()),
@@ -277,7 +383,7 @@ export class BallotPrinter {
 			borderWidth: mm2dpt(1)
 		});
 
-		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+		page.drawSvgPath(arrowDownSvgPath, {
 			x: mm2dpt(noX - 1.1),
 			y: page.getHeight() - mm2dpt(rect.top()),
 			borderColor: black,
@@ -285,7 +391,7 @@ export class BallotPrinter {
 			borderWidth: mm2dpt(1)
 		});
 
-		let y = this.drawText(page, countText, 14, rect).y;
+		let y = this.drawText(page, voteTexts.que.youHaveInfo(vote), 14, rect).y;
 
 		this.drawText(page, betweenText, 14, new Rect(
 			new Vector2D(yesX + boxSize + boxOffset + (-0.7), rect.top()),
@@ -295,11 +401,11 @@ export class BallotPrinter {
 		rect = rect.shrinkFromTop(y + 5);
 
 
-		for (const name of vote.config.namen) {
+		for (const name of vote.config.candidateInfos) {
 
 			const textY = rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5;
 
-			this.drawText(page, name, fontSize, new Rect(
+			this.drawText(page, `${name.vorname} ${name.nachname}`, fontSize, new Rect(
 				new Vector2D(rect.left(), textY),
 				new Vector2D(rect.width() / 2, dpt2mm(fontSize)))
 			);
@@ -329,15 +435,13 @@ export class BallotPrinter {
 	}
 
 	renderVew(page: PDFPage, vote: Vote, rect0: Rect): number {
-		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist sind die ${vote.config.anzahlAemter} Bewerber*innen mit den meisten Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
-		const text2 = `Sie haben ${vote.config.anzahlAemter} Stimme${vote.config.anzahlAemter > 1 ? "n" : ""}`;
-		return this.renderEwAndVew(page, vote, rect0, text, text2);
+		return this.renderEwAndVew(page, vote, rect0,
+			voteTexts.vew.explanation(vote), voteTexts.vew.youHaveInfo(vote));
 	}
 
 	renderEw(page: PDFPage, vote: Vote, rect0: Rect): number {
-		const text = `Die Wahl erfolgt gemäß ${vote.config.referenz} und § 19 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist derjenige mit über 50% der Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.`;
-		const text2 = `Sie haben 1 Stimme`;
-		return this.renderEwAndVew(page, vote, rect0, text, text2);
+		return this.renderEwAndVew(page, vote, rect0,
+			voteTexts.ew.explanation(vote), voteTexts.ew.youHaveInfo(vote));
 	}
 
 	renderEwAndVew(page: PDFPage, vote: Vote, rect0: Rect, text: string, countText: string): number {
@@ -355,7 +459,7 @@ export class BallotPrinter {
 
 		const sizeMM = boxSize + 2;
 
-		page.drawSvgPath("M24 40 8 24l2.1-2.1 12.4 12.4V8h3v26.3l12.4-12.4L40 24Z", {
+		page.drawSvgPath(arrowDownSvgPath, {
 			x: mm2dpt(rect.left() + (8 - sizeMM / 2)),
 			y: page.getHeight() - mm2dpt(rect.top()),
 			borderColor: black,
@@ -366,11 +470,11 @@ export class BallotPrinter {
 		rect = rect.shrinkFromTop(this.drawText(page, countText, 14, rect.shrinkFromLeft(leftOffset)).y);
 		rect = rect.shrinkFromTop(5);
 
-		for (const name of vote.config.namen) {
+		for (const name of vote.config.candidateInfos) {
 
 			this.drawCheckbox(page, rect.shrinkFromLeft(boxOffset), nameSize, boxSize);
 
-			this.drawText(page, name, fontSize, new Rect(
+			this.drawText(page, `${name.vorname} ${name.nachname}`, fontSize, new Rect(
 				new Vector2D(rect.left() + leftOffset, rect.top() + (nameSize - dpt2mm(fontSize)) / 2 - 1.5),
 				new Vector2D(rect.width() - leftOffset, dpt2mm(fontSize)))
 			);

@@ -6,6 +6,10 @@ export class Rect {
 	public constructor(private _topLeft: Vector2D, private _size: Vector2D) {
 	}
 
+	public static ofValues(x: number, y: number, width: number, height: number): Rect {
+		return new Rect(new Vector2D(x, y), new Vector2D(width, height));
+	}
+
 	size(): Vector2D {
 		return this._size;
 	}

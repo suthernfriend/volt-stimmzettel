@@ -1,0 +1,40 @@
+votingSystems:
+  ew: # Einzelwahl
+    explanation: |
+      Die Wahl erfolgt gemäß {referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist der*die
+      Bewerber*in die mehr als 50 % der Stimmen auf sich vereint. Enthaltungen gelten als nicht abgegebene Stimmen und 
+      werden durch leere Felder angezeigt.
+    crossCount:
+      n: Sie haben 1 Stimme
+  vew:
+    explanation: |
+      Die Wahl erfolgt gemäß ${referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt sind die 
+      ${anzahlAemter} Bewerber*innen mit den meisten Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und 
+      werden durch leere Felder angezeigt.
+    crossCount:
+      1: Sie haben 1 Stimme
+      n: Sie haben {n} Stimmen
+  que: # Querulantenwahl
+    explanation: |
+      Die Wahl erfolgt gemäß ${vote.config.referenz}. Zum nächsten Wahlgang zugelassen sind alle Bewerber*innen, die 
+      mehr Ja- als Nein-Stimmen erhalten. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.
+    crossCount:
+      n: Sie haben bei jedem*jeder Bewerber*in 1 Stimme
+  borda: # Borda-Count
+    explanation: |
+      Die Wahl erfolgt gemäß ${referenz}. Jedem Bewerber kann dabei eine Punktzahl zwischen 1 und ${hoechstePunktzahl} 
+      vergeben werden, dabei darf keine Punktzahl doppelt vergeben werden. Die ${anzahlAemter} Bewerber*innen mit den
+      höchsten Punktzahlen sind gewählt. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder
+      angezeigt.
+    crossCount:
+      n: Sie können jede Punktzahl von 1 bis ${n} einmal vergeben
+  star: # Modified Star Voting
+    explanation: |
+      Die Wahl erfolgt gemäß § 23 der Allgemeinen Wahlordnung von Volt Deutschland. Jedem Bewerber kann dabei eine 
+      Punktzahl zwischen 0 und ${hoechstePunktzahl} vergeben werden. Punktzahlen können mehrfach vergeben werden. Die
+      Reihenfolge ergibt sich durch den Mittelwert der vergebenen Punktzahlen, wobei die Bewerber jeweils nochmal im
+      direkten Vergleich verglichen werden. Enthaltungen werden als nicht abgegebene Stimmen gezählt und werden durch
+      leere Felder angezeigt. Bewerber die von mehr als der Hälfte der Stimmberechtigten mit 0 Punkten bewertet werden,
+      sind nicht für die Liste zugelassen.
+    crossCount:
+      n: Sie können bei jedem Bewerber eine Punktzahl von 0 bis ${hoechstePunktzahl} vergeben.

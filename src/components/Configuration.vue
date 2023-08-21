@@ -2,12 +2,12 @@
 
 import SimpleSelect from "@/components/SimpleSelect.vue";
 import WahlConfigurator from "@/components/WahlConfigurator.vue";
-import type { PrintSettings } from "@/lib/PrintSettings";
-import { availableBallotsPerPage, availablePageSizes, isBallotsPerPage } from "@/lib/PrintSettings";
+import type { PrintSettings } from "@/lib/config/PrintSettings";
 import { reactive, ref, watch } from "vue";
-import { defaultConfiguration } from "@/lib/VoteConfiguration";
+import { createDefaultConfiguration } from "@/lib/config/VoteConfiguration";
 import type { VotingSystemKey } from "@/lib/VotingSystemKey";
 import { VotingSystems } from "@/lib/VotingSystems";
+import { BallotTypes } from "@/lib/config/BallotTypes";
 
 const emit = defineEmits<{
 	(e: "update:modelValue", printSettings: PrintSettings): void;
@@ -19,23 +19,20 @@ const props = defineProps<{
 	modelValue: PrintSettings;
 }>();
 
-const pageSize = ref<PrintSettings["pageSize"]>(props.modelValue.pageSize);
-const ballotsPerPage = ref<string>(`${props.modelValue.ballotsPerPage}`);
+const ballotType = ref<string>(props.modelValue.ballotType);
 const verbandName = ref<string>(props.modelValue.verbandName);
 const veranstaltung = ref<string>(props.modelValue.veranstaltung);
 const newVotingSystem = ref<VotingSystemKey>("ew");
 const votes = reactive(props.modelValue.votes);
 
-watch([votes, verbandName, ballotsPerPage, veranstaltung, pageSize], (value) => {
-	const [votes, verbandName, ballotsPerPage, veranstaltung, pageSize] = value;
-	const bpp = parseInt(ballotsPerPage);
+watch([votes, verbandName, veranstaltung, ballotType], (value) => {
+	const [votes, verbandName, veranstaltung, ballotType] = value;
 
-	console.log(`votes: ${votes.length}, verbandName: ${verbandName}, ballotsPerPage: ${ballotsPerPage}, pageSize: ${pageSize}`);
+	console.log(`votes: ${votes.length}, verbandName: ${verbandName}, ballotType: ${ballotType}`);
 	emit("update:modelValue", {
-		pageSize,
+		ballotType,
 		verbandName,
 		veranstaltung,
-		ballotsPerPage: isBallotsPerPage(bpp) ? bpp : 1,
 		votes
 	});
 }, { deep: true });
@@ -46,13 +43,15 @@ async function createVote() {
 		explanation: "",
 		title: "",
 		system: newVotingSystem.value,
-		config: defaultConfiguration
+		config: createDefaultConfiguration()
 	});
 }
 
 async function reset() {
 	votes.splice(0, votes.length);
 }
+
+const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, value]) => ([key, value.name])));
 
 </script>
 
@@ -71,10 +70,10 @@ async function reset() {
 	<div>
 		<h3 class="title is-4">Allgemein</h3>
 		<div class="columns">
-			<div class="column is-two-fifth">
-				<SimpleSelect v-model="pageSize" title="Papier-Typ" :values="availablePageSizes" />
+			<div class="column is-half">
+				<SimpleSelect v-model="ballotType" title="Stimmzettel-Art" :values="ballotTypes" />
 			</div>
-			<div class="column is-three-fifths">
+			<div class="column is-half">
 				<div class="field">
 					<label class="label">Verband</label>
 					<input v-model="verbandName" type="text" class="input" placeholder="Name des Verbands: z.B. Volt Hessen">
@@ -82,15 +81,11 @@ async function reset() {
 			</div>
 		</div>
 		<div class="columns">
-			<div class="column is-two-fifths">
-				<SimpleSelect v-model="ballotsPerPage" title="Stimmzettel pro Seite"
-											:values="availableBallotsPerPage.map(v => `${v}`)" />
-			</div>
-			<div class="column is-three-fifths">
+			<div class="column">
 				<div class="field">
 					<label class="label">Veranstaltung</label>
 					<input v-model="veranstaltung" type="text" class="input"
-								 placeholder="Name des Verbands: z.B. 8. ordentlichen Landesparteitag">
+								 placeholder="Name der Veranstaltung: z.B. 8. ordentlichen Landesparteitag">
 				</div>
 			</div>
 		</div>

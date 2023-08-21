@@ -1,31 +1,35 @@
 <script setup lang="ts">
 import Preview from "@/components/Preview.vue";
-import type { PrintSettings } from "@/lib/PrintSettings";
-import { reactive, ref, watch } from "vue";
+import type { PrintSettings } from "@/lib/config/PrintSettings";
+import { ref, watch } from "vue";
 import Configuration from "@/components/Configuration.vue";
-import { BallotPrinter } from "@/lib/BallotPrinter";
+import { Printer } from "@/lib/Printer";
+import { BallotTypes } from "@/lib/config/BallotTypes";
+import { RandomStringProviderImpl } from "@/lib/impl/RandomStringProviderImpl";
 
 const config = ref<PrintSettings>({
-	pageSize: "A4",
+	ballotType: "A4_1_Extended",
 	votes: [],
 	veranstaltung: "12. ordentlichen Bundesparteitag",
-	ballotsPerPage: 2,
 	verbandName: "Volt Deutschland"
 });
 
+const errorMessage = ref("");
 const documentUrl = ref("");
 
 async function updateBallot() {
 
-	const ballotPrinter = new BallotPrinter({
-		pageSize: config.value.pageSize,
-		ballotsPerPage: config.value.ballotsPerPage,
-		votes: config.value.votes,
-		veranstaltung: config.value.veranstaltung,
-		verbandName: config.value.verbandName
+	const printer = new Printer({
+		ballotType: BallotTypes[config.value.ballotType],
+		randomStringProvider: new RandomStringProviderImpl()
 	});
 
-	documentUrl.value = await ballotPrinter.print();
+	try {
+		documentUrl.value = await printer.print();
+		errorMessage.value = "";
+	} catch (e: any) {
+		errorMessage.value = e.message;
+	}
 }
 
 watch(config, () => {
@@ -50,7 +54,17 @@ watch(config, () => {
 			<div class="column is-half">
 				<Configuration v-model="config" @triggerUpdate="updateBallot" @reset="() => config.votes = []" />
 			</div>
-			<div class="column">
+			<div v-if="errorMessage" class="column">
+				<article class="message is-danger">
+					<div class="message-header">
+						<p>Fehler</p>
+					</div>
+					<div class="message-body">
+						{{ errorMessage }}
+					</div>
+				</article>
+			</div>
+			<div v-else class="column">
 				<Preview :documentUrl="documentUrl" />
 			</div>
 		</main>

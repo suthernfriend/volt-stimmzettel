@@ -8,11 +8,11 @@ const props = defineProps<{
 
 <template>
 	<div class="columns">
-		<div class="column is-four-fifths">
+		<div class="column is-half">
 			<h2 class="title is-2">Preview</h2>
 		</div>
 		<div class="column">
-			<div class="field is-grouped">
+			<div class="field has-addons">
 				<p class="control">
 					<button class="button">
 						<span class="icon is-small"><i class="fas fa-align-left"></i></span>
