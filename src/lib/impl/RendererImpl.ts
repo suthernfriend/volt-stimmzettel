@@ -1,7 +1,7 @@
 import { Rect } from "@/lib/Rect";
 import type { DrawTextOrientation, Renderer } from "@/lib/Renderer";
 import type { Color, PDFFont, PDFImage, PDFPage } from "pdf-lib";
-import { componentsToColor } from "pdf-lib";
+import { componentsToColor, LineCapStyle } from "pdf-lib";
 import { dpt2mm, mm2dpt } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
 
@@ -66,11 +66,23 @@ export class RendererImpl implements Renderer {
 	}
 
 	drawCheckbox(rect: Rect): Rect {
-		return rect;
+
+		const lines: { start: Vector2D, end: Vector2D }[] = [
+			{ start: rect.topLeft(), end: rect.topRight() },
+			{ start: rect.topRight(), end: rect.bottomRight() },
+			{ start: rect.bottomRight(), end: rect.bottomLeft() },
+			{ start: rect.bottomLeft(), end: rect.topLeft() }
+		];
+
+		for (const line of lines) {
+			this.drawLine(line.start, line.end, 0.2);
+		}
+
+		return Rect.ofValues(rect.left(), rect.top(), rect.width(), rect.height());
 	}
 
 	drawHelpRect(rect: Rect, color: number): void {
-		// return;
+		return;
 		const colors: Color[] = [
 			componentsToColor([1, 0, 0])!,
 			componentsToColor([0, 1, 0])!,
@@ -287,7 +299,8 @@ export class RendererImpl implements Renderer {
 			start: { x: translatedStart.left(), y: translatedStart.top() },
 			end: { x: translatedEnd.left(), y: translatedEnd.top() },
 			color: componentsToColor([0, 0, 0]),
-			thickness: mm2dpt(thinkness)
+			thickness: mm2dpt(thinkness),
+			lineCap: LineCapStyle.Projecting
 		}));
 
 	}

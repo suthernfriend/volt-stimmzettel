@@ -5,6 +5,7 @@ import { Rect } from "@/lib/Rect";
 import { textProvider } from "@/lib/impl/TextProvider";
 import { dpt2mm } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
+import { renderName } from "@/lib/instructions/RenderName";
 
 export interface SimpleResultPageVotePrintInstructionsOptions {
 	referenz: string;
@@ -39,11 +40,6 @@ export abstract class SimpleResultPageVotePrintInstructions implements VotePrint
 		const fontSize = 11;
 		const stepLength = 40;
 
-		function rennderName(candidate: CandidateInfo, showAssJur: boolean) {
-			if (showAssJur && candidate.assJur)
-				return `${candidate.vorname} ${candidate.nachname} (Ass.jur.)`;
-			return `${candidate.vorname} ${candidate.nachname}`;
-		}
 
 		for (const candidate of this.options.candidates) {
 
@@ -85,7 +81,7 @@ export abstract class SimpleResultPageVotePrintInstructions implements VotePrint
 			}
 
 			rect = rect.shrinkFromTopWithRect(renderer
-				.drawText(rennderName(candidate, this.options.showAssJur), rect, 11))
+				.drawText(renderName(candidate, this.options.showAssJur), rect, 11))
 				.shrinkFromTop(5);
 
 		}

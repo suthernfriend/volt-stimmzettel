@@ -55,38 +55,63 @@ export class Rect {
 	}
 
 	shrinkFromTop(by: number): Rect {
-		return new Rect(
+		const nr = new Rect(
 			this._topLeft.add(new Vector2D(0, by)),
 			this._size.sub(new Vector2D(0, by))
 		);
+
+		if (nr.height() < 0 || nr.width() < 0)
+			throw new Error(`Negative rect. created by ${this.toString()} shrinkFromTop(${by})`);
+
+		return nr;
 	}
 
 	shrinkFromTopWithRect(rect: Rect): Rect {
-		return new Rect(
+		const nr = new Rect(
 			this._topLeft.add(new Vector2D(0, rect.height())),
 			this._size.sub(new Vector2D(0, rect.height()))
 		);
+
+		if (nr.height() < 0 || nr.width() < 0)
+			throw new Error(`Negative rect. created by ${this.toString()} shrinkFromTopWithRect(${rect.toString()})`);
+
+		return nr;
 	}
 
 	shrinkFromLeft(by: number): Rect {
-		return new Rect(
+		const nr = new Rect(
 			this._topLeft.add(new Vector2D(by, 0)),
 			this._size.sub(new Vector2D(by, 0))
 		);
+
+		if (nr.height() < 0 || nr.width() < 0)
+			throw new Error(`Negative rect. created by ${this.toString()} shrinkFromLeft(${by})`);
+
+		return nr;
 	}
 
 	shrinkByPadding(padding: number): Rect {
-		return new Rect(
+		const nr = new Rect(
 			this._topLeft.add(new Vector2D(padding, padding)),
 			this._size.sub(new Vector2D(padding * 2, padding * 2))
 		);
+
+		if (nr.height() < 0 || nr.width() < 0)
+			throw new Error(`Negative rect. created by ${this.toString()} shrinkByPadding(${padding})`);
+
+		return nr;
 	}
 
 	shrinkFromRight(by: number): Rect {
-		return new Rect(
+		const nr = new Rect(
 			this._topLeft,
 			this._size.sub(new Vector2D(by, 0))
 		);
+
+		if (nr.height() < 0 || nr.width() < 0)
+			throw new Error(`Negative rect. created by ${this.toString()} shrinkFromRight(${by})`);
+
+		return nr;
 	}
 
 	toString(): string {

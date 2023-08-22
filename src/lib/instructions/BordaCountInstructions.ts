@@ -2,12 +2,11 @@ import type { CandidateInfo } from "@/lib/CandidateInfo";
 import type { VotePrintInstructions } from "@/lib/VotePrintInstructions";
 import type { Renderer } from "@/lib/Renderer";
 import { Rect } from "@/lib/Rect";
-import {
-	SimpleResultPageVotePrintInstructions
-} from "@/lib/instructions/SimpleResultPageVotePrintInstructions";
 import type {
 	SimpleResultPageVotePrintInstructionsOptions
 } from "@/lib/instructions/SimpleResultPageVotePrintInstructions";
+
+import { SimpleResultPageVotePrintInstructions } from "@/lib/instructions/SimpleResultPageVotePrintInstructions";
 
 export interface BordaCountInstructionsOptions extends SimpleResultPageVotePrintInstructionsOptions {
 	hoechstePunktzahl: number;

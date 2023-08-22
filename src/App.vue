@@ -9,7 +9,7 @@ import { RandomStringProviderImpl } from "@/lib/impl/RandomStringProviderImpl";
 import { VotePrintInstructionsFactory } from "@/lib/instructions/VotePrintInstructionsFactory";
 
 const config = ref<PrintSettings>({
-	ballotType: "A4_2",
+	ballotType: "A6_1",
 	votes: [],
 	veranstaltung: "12. ordentlichen Bundesparteitag",
 	verbandName: "Volt Deutschland",

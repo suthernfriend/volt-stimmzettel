@@ -14,6 +14,14 @@ export class RectWorker {
 		return new RectWorker(this.rect.shrinkFromTop(y), this.originalRect);
 	}
 
+	renderImmutable(fun: (rect: Rect) => Rect | void): RectWorker {
+
+		// response is ignored. we just call with current rect
+		fun(this.rect);
+
+		return this;
+	}
+
 	render(fun: (rect: Rect) => Rect): RectWorker {
 		const resp = fun(this.rect);
 		const newRect = this.rect.shrinkFromTopWithRect(resp);

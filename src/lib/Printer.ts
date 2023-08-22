@@ -68,6 +68,8 @@ export class Printer {
 				page, font, images, areas: areas.map(area => area.shrinkByPadding(5))
 			});
 
+			console.log(renderer.virtual().toString());
+
 			RectWorker.create(renderer.virtual())
 				.render(rect => this.printTitle(renderer, rect))
 				.skip(5)
@@ -108,7 +110,7 @@ export class Printer {
 
 		renderer.commit();
 
-		return Rect.ofValues(maxRect.left(), maxRect.top(), maxRect.width(), maxRect.height() - rect.height());
+		return Rect.ofValues(rect.left(), rect.top(), maxRect.width(), rect.height() > imageHeight ? rect.height() : imageHeight);
 	}
 
 	/**
