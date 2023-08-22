@@ -42,5 +42,5 @@ ergebniszettel:
   titel: >
     Ergebnisse der Abstimmung zum ${event} von ${org}
   warnung: >
-    Dieser Ergebniszettel ist der Niederschrift der jeweiligen Veranstaltung beizufügen. Stimmzettel sind nur gültig 
-    wenn sie ein Volt Logo sowie der das für die Abstimmung einzigartige Merkmal "${ballotId}" tragen.
+    Dieser Ergebniszettel ist der Niederschrift der jeweiligen Veranstaltung beizufügen. Stimmzettel sind nur gültig,
+    wenn sie ein Volt Logo sowie das für die Abstimmung einzigartige Merkmal "${ballotId}" tragen.

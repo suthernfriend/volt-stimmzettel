@@ -62,7 +62,7 @@ export class RendererImpl implements Renderer {
 	}
 
 	drawHelpRect(rect: Rect, color: number): void {
-		return;
+		// return;
 		const colors: Color[] = [
 			componentsToColor([1, 0, 0])!,
 			componentsToColor([0, 1, 0])!,
