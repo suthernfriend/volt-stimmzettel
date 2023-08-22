@@ -2,50 +2,45 @@ import type { VotePrintInstructions } from "@/lib/VotePrintInstructions";
 import type { Vote } from "@/lib/Vote";
 import { EinzelwahlInstructions } from "@/lib/instructions/EinzelwahlInstructions";
 import { BordaCountInstructions } from "@/lib/instructions/BordaCountInstructions";
-import { QuerulantenwahlInstructions } from "@/lib/instructions/QuerulantenwahlInstructions";
 import { StarVoteInstructions } from "@/lib/instructions/StarVoteInstructions";
 
 export class VotePrintInstructionsFactory {
 
-    fromVote(vote: Vote, verbandName: string): VotePrintInstructions {
+	fromVote(vote: Vote, verbandName: string): VotePrintInstructions {
 
-        if (vote.system === "vew" && vote.config.candidateInfos.length <= vote.config.anzahlAemter) {
-            return new QuerulantenwahlInstructions({
-                candidates: vote.config.candidateInfos,
-                showAssJur: vote.config.showAssJur
-            });
-        }
+		switch (vote.system) {
+			case "ew":
+			case "vew":
+			case "que":
+				console.log(vote.config);
 
-        switch (vote.system) {
-            case "ew":
-            case "vew":
-                return new EinzelwahlInstructions({
-                    isYesNo: vote.config.anzahlAemter === 1 && vote.config.candidateInfos.length === 1,
-                    anzahlAemter: vote.config.anzahlAemter,
-                    candidates: vote.config.candidateInfos,
-                    showAssJur: vote.config.showAssJur,
-                    toElect: vote.config.toElect,
-                    verbandName: verbandName,
-                    referenz: vote.config.referenz
-                });
-            case "borda":
-                return new BordaCountInstructions({
-                    candidates: vote.config.candidateInfos,
-                    showAssJur: vote.config.showAssJur,
-                    hoechstePunktzahl: vote.config.hoechstePunktzahl
-                });
-            case "que":
-                return new QuerulantenwahlInstructions({
-                    candidates: vote.config.candidateInfos,
-                    showAssJur: vote.config.showAssJur
-                });
-            case "star":
-                return new StarVoteInstructions({
-                    candidates: vote.config.candidateInfos,
-                    maxPoints: vote.config.candidateInfos.length < 15 ? 5 : 10
-                });
-            default:
-                throw new Error(`Unknown voting system: ${vote.system}`);
-        }
-    }
+				const isYesNo = (vote.system === "ew" && vote.config.candidateInfos.length === 1) ||
+					(vote.system === "vew" && vote.config.anzahlAemter >= vote.config.candidateInfos.length) ||
+					vote.system === "que";
+
+				return new EinzelwahlInstructions({
+					isYesNo,
+					anzahlAemter: vote.config.anzahlAemter,
+					candidates: vote.config.candidateInfos,
+					showAssJur: vote.config.showAssJur,
+					toElect: vote.config.toElect,
+					verbandName: verbandName,
+					referenz: vote.config.referenz,
+					system: vote.system
+				});
+			case "borda":
+				return new BordaCountInstructions({
+					candidates: vote.config.candidateInfos,
+					showAssJur: vote.config.showAssJur,
+					hoechstePunktzahl: vote.config.hoechstePunktzahl
+				});
+			case "star":
+				return new StarVoteInstructions({
+					candidates: vote.config.candidateInfos,
+					maxPoints: vote.config.candidateInfos.length < 15 ? 5 : 10
+				});
+			default:
+				throw new Error(`Unknown voting system: ${vote.system}`);
+		}
+	}
 }

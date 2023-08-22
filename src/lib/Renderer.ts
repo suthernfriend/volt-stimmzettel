@@ -1,4 +1,5 @@
 import type { Rect } from "@/lib/Rect";
+import { Vector2D } from "@/lib/Vector2D";
 
 export type DrawTextOrientation = "left" | "right" | "center" | "justified";
 
@@ -12,6 +13,10 @@ export interface Renderer {
 	drawImage(id: string, rect: Rect): Rect;
 
 	drawSvgPath(path: string, rect: Rect): Rect;
+
+	drawLine(start: Vector2D, end: Vector2D, thinkness: number): void;
+
+	commit(): void;
 
 	virtual(): Rect;
 }

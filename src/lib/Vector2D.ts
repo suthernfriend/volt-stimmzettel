@@ -18,6 +18,10 @@ export class Vector2D {
 		return new Vector2D(this.x / factor, this.y / factor);
 	}
 
+	static of(x: number, y: number): Vector2D {
+		return new Vector2D(x, y);
+	}
+
 	public toString(): string {
 		return `(${this.x}, ${this.y})`;
 	}

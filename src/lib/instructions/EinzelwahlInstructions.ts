@@ -1,62 +1,43 @@
-import type { VotePrintInstructions } from "@/lib/VotePrintInstructions";
 import { Rect } from "@/lib/Rect";
-import type { CandidateInfo } from "@/lib/CandidateInfo";
 import type { Renderer } from "@/lib/Renderer";
-
-import textYaml from "@/resources/text.yaml";
 import { textProvider } from "@/lib/impl/TextProvider";
+import {
+	SimpleResultPageVotePrintInstructions
+} from "@/lib/instructions/SimpleResultPageVotePrintInstructions";
+import type {
+	SimpleResultPageVotePrintInstructionsOptions
+} from "@/lib/instructions/SimpleResultPageVotePrintInstructions";
+import { RectWorker } from "@/lib/RectWorker";
 
-export interface EinzelwahlInstructionsOptions {
-    referenz: string;
-    isYesNo: boolean;
-    candidates: CandidateInfo[];
-    showAssJur: boolean;
-    toElect: string;
-    anzahlAemter: number;
-    verbandName: string;
+export interface EinzelwahlInstructionsOptions extends SimpleResultPageVotePrintInstructionsOptions {
+	anzahlAemter: number;
 }
 
-export class EinzelwahlInstructions implements VotePrintInstructions {
+export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstructions {
 
-    constructor(private options: EinzelwahlInstructionsOptions) {
-    }
+	constructor(private voptions: EinzelwahlInstructionsOptions) {
+		super(voptions);
+	}
 
-    async drawBallot(renderer: Renderer, offsetY: number): Promise<Rect> {
+	drawBallot(renderer: Renderer, offsetY: number): Rect {
 
-        const maxRect = renderer.virtual().shrinkFromTop(offsetY);
-        let rect = maxRect;
+		const maxRect = renderer.virtual().shrinkFromTop(offsetY);
+		let rect = maxRect;
 
-        const ew = textYaml.votingSystems.ew;
+		const text = textProvider().votingSystems.ew.explanation.replace(`{referenz}`, this.voptions.referenz);
+		const titleFontSize = 12;
+		const smallFontSize = 8;
 
-        const text = textProvider().votingSystems.ew.explanation.replace(`{referenz}`, this.options.referenz);
-        const titleFontSize = 12;
-        const smallFontSize = 8;
+		console.log(text);
+		console.log(rect.toString());
 
-        rect = maxRect.shrinkFromTopWithRect(
-            renderer.drawText("Wahl zum " + this.options.toElect, maxRect, titleFontSize).shrinkFromTop(5));
-        rect = rect.shrinkFromTopWithRect(
-            renderer.drawText(text, rect, smallFontSize));
+		return RectWorker.create(rect)
+			.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect, rect, titleFontSize))
+			.skip(3)
+			.render(rect => { return  console.log(rect), renderer.drawText(text, rect, smallFontSize) })
+			.commit(renderer)
+			.usedArea();
+	}
 
-        return Rect.ofValues(rect.left(), rect.top(), rect.width(), maxRect.top() - rect.top());
-    }
-
-    async drawResultPage(renderer: Renderer, offsetY: number): Promise<Rect> {
-
-        const maxRect = renderer.virtual().shrinkFromTop(offsetY);
-        let rect = maxRect;
-
-        rect = rect.shrinkFromTopWithRect(renderer
-            .drawText(`Wahl zum ${this.options.toElect} von ${this.options.verbandName}`, rect, 12))
-            .shrinkFromTop(5);
-
-        for (const candidate of this.options.candidates) {
-            
-            rect = rect.shrinkFromTopWithRect(renderer
-                .drawText(`${candidate.vorname} ${candidate.nachname}`, rect, 11))
-                .shrinkFromTop(5);
-        }
-
-        return Rect.ofValues(rect.left(), rect.top(), rect.width(), rect.top() - maxRect.top());
-    }
 
 }

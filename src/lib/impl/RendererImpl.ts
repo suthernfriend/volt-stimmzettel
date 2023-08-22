@@ -17,6 +17,14 @@ export class RendererImpl implements Renderer {
 	constructor(private options: RendererImplOptions) {
 	}
 
+	private queue: (() => void)[] = [];
+
+	commit(): void {
+		for (const item of this.queue)
+			item();
+		this.queue = [];
+	}
+
 	public virtual(): Rect {
 		let height = 0;
 		let width = 0;
@@ -69,20 +77,23 @@ export class RendererImpl implements Renderer {
 			componentsToColor([0, 0, 1])!,
 			componentsToColor([1, 1, 0])!,
 			componentsToColor([1, 0, 1])!,
-			componentsToColor([0, 1, 1])!
+			componentsToColor([0, 1, 1])!,
+			componentsToColor([1, 0.5, 0])!,
+			componentsToColor([1, 0, 0.5])!,
+			componentsToColor([0, 0.5, 1])!
 		];
 
 		const adjustedRect = this.translate(rect);
 		console.log("drawHelpRect", rect.toString(), adjustedRect.toString(), color);
 
-		this.options.page.drawRectangle({
+		this.queue.push(() => this.options.page.drawRectangle({
 			x: adjustedRect.left(),
 			y: adjustedRect.top(),
 			width: adjustedRect.width(),
 			height: adjustedRect.height(),
 			borderWidth: mm2dpt(0.5),
 			borderColor: colors[color]
-		});
+		}));
 	}
 
 	drawCheckboxAndText(text: string, rect: Rect, checkboxSize?: number, borderWidth?: number, fontSize?: number): Rect {
@@ -104,14 +115,14 @@ export class RendererImpl implements Renderer {
 
 		const adjustedCheckBoxRect = this.translate(checkBoxRect);
 
-		this.options.page.drawRectangle({
+		this.queue.push(() => this.options.page.drawRectangle({
 			x: adjustedCheckBoxRect.left(),
 			y: adjustedCheckBoxRect.top(),
 			width: adjustedCheckBoxRect.width(),
 			height: adjustedCheckBoxRect.height(),
 			borderWidth: mm2dpt(0.5),
 			borderColor: black
-		});
+		}));
 
 		const space = checkboxSize;
 
@@ -154,12 +165,12 @@ export class RendererImpl implements Renderer {
 
 		const adjustedRect = this.translate(realRect);
 
-		this.options.page.drawImage(image, {
+		this.queue.push(() => this.options.page.drawImage(image, {
 			x: adjustedRect.left(),
 			y: adjustedRect.top(),
 			width: adjustedRect.width(),
 			height: adjustedRect.height()
-		});
+		}));
 
 		return rect;
 	}
@@ -184,13 +195,13 @@ export class RendererImpl implements Renderer {
 		const adjustedRect = this.translate(lineRect);
 
 		this.drawHelpRect(lineRect, 1);
-		this.options.page.drawText(text, {
+		this.queue.push(() => this.options.page.drawText(text, {
 			x: adjustedRect.left(),
 			y: adjustedRect.top(),
 			size: fontSize,
 			font: this.options.font,
 			maxWidth: adjustedRect.width()
-		});
+		}));
 
 		return rect;
 	}
@@ -240,21 +251,22 @@ export class RendererImpl implements Renderer {
 			else if (orientation === "justified")
 				throw Error("Not implemented yet");
 
+			const width = dpt2mm(this.options.font.widthOfTextAtSize(line, fontSize)) + 1;
+
 			const lineRect = Rect.ofValues(
-				left, rect.top() + y,
-				rect.width(), singleLineHeight
+				left, rect.top() + y, width, singleLineHeight
 			);
 
 			const adjustedRect = this.translate(lineRect);
 
 			this.drawHelpRect(lineRect, (i++) % 4);
-			this.options.page.drawText(line, {
+			this.queue.push(() => this.options.page.drawText(line, {
 				x: adjustedRect.left(),
 				y: adjustedRect.top(),
 				size: fontSize,
 				font: this.options.font,
 				maxWidth: adjustedRect.width()
-			});
+			}));
 
 			if (adjustedRect.width() > maxWidth)
 				maxWidth = adjustedRect.width();
@@ -271,12 +283,12 @@ export class RendererImpl implements Renderer {
 		const translatedStart = this.translate(Rect.ofValues(start.x, start.y, 1, 1));
 		const translatedEnd = this.translate(Rect.ofValues(end.x, end.y, 1, 1));
 
-		this.options.page.drawLine({
+		this.queue.push(() => this.options.page.drawLine({
 			start: { x: translatedStart.left(), y: translatedStart.top() },
 			end: { x: translatedEnd.left(), y: translatedEnd.top() },
 			color: componentsToColor([0, 0, 0]),
 			thickness: mm2dpt(thinkness)
-		});
+		}));
 
 	}
 }

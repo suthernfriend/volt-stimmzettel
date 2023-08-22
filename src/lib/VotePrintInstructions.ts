@@ -8,13 +8,13 @@ export interface VotePrintInstructions {
 	 * @param renderer The renderer to draw on
 	 * @param offsetY The offset from the top of the page
 	 */
-	drawBallot(renderer: Renderer, offsetY: number): Promise<Rect>;
+	drawBallot(renderer: Renderer, offsetY: number): Rect;
 
 	/**
 	 * Draws the result page on the given renderer and returns the bounding box of area used.
 	 * @param renderer The renderer to draw on
 	 * @param offsetY The offset from the top of the page
 	 */
-	drawResultPage(renderer: Renderer, offsetY: number): Promise<Rect>;
+	drawResultPage(renderer: Renderer, offsetY: number): Rect;
 
 }

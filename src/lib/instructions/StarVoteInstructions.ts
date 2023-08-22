@@ -10,11 +10,14 @@ export interface StarVoteInstructionsOptions {
 
 export class StarVoteInstructions implements VotePrintInstructions {
 
-	constructor(private options: StarVoteInstructionsOptions) {
+	constructor(private voptions: StarVoteInstructionsOptions) {
 	}
 
+	drawResultPage(renderer: Renderer, offsetY: number): Rect {
+		return Rect.ofValues(0, 0, 0, 0);
+	}
 
-	drawBallot(renderer: Renderer, offsetY: number): Promise<Rect> {
-		return Promise.resolve(undefined);
+	drawBallot(renderer: Renderer, offsetY: number): Rect {
+		return Rect.ofValues(0, 0, 0, 0);
 	}
 }
