@@ -96,5 +96,24 @@ export const BallotTypes: { [k: string]: BallotType } = {
             rdpt2mmByValues(0, 0, pdfPage.getWidth() / 2, pdfPage.getHeight()),
             rdpt2mmByValues(pdfPage.getWidth() / 2, 0, pdfPage.getWidth() / 2, pdfPage.getHeight())
         ]])
+    } satisfies BallotType,
+    A3_1_Extended3: {
+        name: "1 Stimmzettel auf A3 (in 3 Spalten)",
+        pageSize: [PageSizes.A3[1], PageSizes.A3[0]],
+        helpLines: (page: PDFPage) => ([]),
+        areas: pdfPage => ([[
+            rdpt2mmByValues(0, 0, pdfPage.getWidth() / 3, pdfPage.getHeight()),
+            rdpt2mmByValues(pdfPage.getWidth() * (1 / 3), 0, pdfPage.getWidth() / 3, pdfPage.getHeight()),
+            rdpt2mmByValues(pdfPage.getWidth() * (2 / 3), 0, pdfPage.getWidth() / 3, pdfPage.getHeight())
+        ]])
+    } satisfies BallotType,
+    A3_V1_Extended: {
+        name: "1 Stimmzettel auf A3 Hochkant (in 2 Spalten)",
+        pageSize: [PageSizes.A3[0], PageSizes.A3[1]],
+        helpLines: (page: PDFPage) => ([]),
+        areas: pdfPage => ([[
+            rdpt2mmByValues(0, 0, pdfPage.getWidth() / 2, pdfPage.getHeight()),
+            rdpt2mmByValues(pdfPage.getWidth() / 2, 0, pdfPage.getWidth() / 2, pdfPage.getHeight())
+        ]])
     } satisfies BallotType
 };

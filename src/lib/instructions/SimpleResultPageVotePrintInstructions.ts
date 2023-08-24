@@ -12,7 +12,7 @@ export interface SimpleResultPageVotePrintInstructionsOptions {
 	verbandName: string;
 	isYesNo: boolean;
 	candidates: CandidateInfo[];
-	system: "ew" | "vew" | "que";
+	system: "ew" | "vew" | "que" | "borda";
 	toElect: string;
 	showAssJur: boolean;
 }
