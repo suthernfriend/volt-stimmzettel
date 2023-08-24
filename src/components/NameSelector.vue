@@ -86,7 +86,7 @@ function handleCompletedEvent(e: Event) {
 			<tr v-for="(value, key) in names">
 				<td><input type="text" class="input" v-model="names[key].vorname"></td>
 				<td><input type="text" class="input" v-model="names[key].nachname"></td>
-				<td>
+				<td v-if="props.wantAssJur">
 					<input type="checkbox" class="checkbox" v-model="names[key].assJur">
 				</td>
 				<td v-if="props.wantListenplatz"><input type="number" class="input" v-model="names[key].listenplatz"></td>

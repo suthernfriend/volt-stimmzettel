@@ -16,6 +16,8 @@ export interface Renderer {
 
 	drawLine(start: Vector2D, end: Vector2D, thinkness: number): void;
 
+	reserveVertical(rect: Rect): Rect;
+
 	commit(): void;
 
 	virtual(): Rect;

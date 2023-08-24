@@ -25,6 +25,39 @@ export class RendererImpl implements Renderer {
 		this.queue = [];
 	}
 
+	/**
+	 * Ensure that the given rect can be drawn on the current area.
+	 * @param rect The rect to reserve space for.
+	 * @returns A rect that can be used to skip to an area where the given rect can be drawn.
+	 */
+	public reserveVertical(rect: Rect): Rect {
+
+		const yCurrent = rect.top();
+		const yRequired = rect.bottom();
+
+		let offset = 0;
+
+		for (const area of this.options.areas) {
+			const areaTop = offset;
+			const areaBottom = offset + area.height();
+
+			if (yCurrent >= areaTop && yRequired <= areaBottom) {
+				// rect fits into this area
+				return Rect.ofValues(0, 0, 0, 0);
+			} else if (yCurrent >= areaTop && yRequired > areaBottom) {
+				// rect does not fit into this area, but we can skip to the next one
+				return Rect.ofValues(0, areaBottom - yCurrent, 0, 0);
+			} else if (yCurrent < areaTop) {
+				// rect is above this area, we can skip to it
+				offset += areaBottom;
+			} else {
+				throw new Error("This should never happen");
+			}
+		}
+
+		throw new Error("Rect does not fit into any area");
+	}
+
 	public virtual(): Rect {
 		let height = 0;
 		let width = 0;
@@ -302,6 +335,5 @@ export class RendererImpl implements Renderer {
 			thickness: mm2dpt(thinkness),
 			lineCap: LineCapStyle.Projecting
 		}));
-
 	}
 }
