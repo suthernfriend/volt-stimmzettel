@@ -12,6 +12,9 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "types": [
+      "@modyfi/vite-plugin-yaml/modules"
+    ],
     "paths": {
       "@/*": [
         "./src/*"

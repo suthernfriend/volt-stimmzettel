@@ -49,17 +49,20 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 		const nameFontHeight = dpt2mm(nameFontSize);
 		const boxOffset = (nameFontHeight - boxSize) / 2;
 
+		const self = this;
+
 		function renderNormal(worker: RectWorker, candidate: CandidateInfo) {
 			return worker
 				.renderImmutable(rect => {
 					const checkBox = Rect.ofValues(rect.left() + boxSpacingX, rect.top() + boxOffset + 0.4, boxSize, boxSize);
 					return renderer.drawCheckbox(checkBox);
 				})
-				.render(rect => renderer.drawText(renderName(candidate), rect.shrinkFromLeft(boxSize + boxSpacingX * 2), nameFontSize))
+				.render(rect => renderer.drawText(renderName(candidate, self.voptions.showAssJur), rect.shrinkFromLeft(boxSize + boxSpacingX * 2), nameFontSize))
 				.skip(5);
 		}
 
 		function renderYesNo(worker: RectWorker, candidate: CandidateInfo) {
+
 			return worker
 				.renderImmutable(rect => {
 					const x1 = rect.left() + rect.width() * 0.5;
@@ -72,9 +75,8 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 
 					renderer.drawText("Ja", Rect.ofValues(x1 + boxSize + boxSpacingX, rect.top(), textWidth, nameFontHeight + 1), nameFontSize);
 					renderer.drawText("Nein", Rect.ofValues(x2 + boxSize + boxSpacingX, rect.top(), textWidth, nameFontHeight + 1), nameFontSize);
-
 				})
-				.render(rect => renderer.drawText(renderName(candidate), rect, nameFontSize))
+				.render(rect => renderer.drawText(renderName(candidate, self.voptions.showAssJur), rect, nameFontSize))
 				.skip(5);
 		}
 

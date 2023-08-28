@@ -36,7 +36,6 @@ export class VotePrintInstructionsFactory {
                     referenz: vote.config.referenz,
                     toElect: vote.config.toElect,
                     isYesNo: false,
-                    anzahlAemter: vote.config.anzahlAemter,
                     system: vote.system,
                     verbandName: verbandName
                 });
