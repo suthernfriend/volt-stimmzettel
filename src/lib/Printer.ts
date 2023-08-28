@@ -1,5 +1,5 @@
 import type { RandomStringProvider } from "@/lib/RandomStringProvider";
-import { componentsToColor, PageSizes, PDFDocument, PDFFont, PDFImage } from "pdf-lib";
+import { componentsToColor, PageSizes, PDFDocument, PDFFont, PDFImage, PDFPage } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import axios from "axios";
 import ubuntuRegularUrl from "@/assets/Ubuntu-Regular.ttf?url";
@@ -16,7 +16,6 @@ import { Vector2D } from "@/lib/Vector2D";
 import { RectWorker } from "@/lib/RectWorker";
 
 export interface PrinterOptions {
-	randomStringProvider: RandomStringProvider;
 	ballotType: BallotType;
 	veranstaltung: string;
 	verbandName: string;
@@ -161,11 +160,11 @@ export class Printer {
 		for (const instruction of instructions) {
 
 			try {
-				rect = RectWorker.create(rect)
+				rect = rect.shrinkFromTopWithRect(RectWorker.create(rect)
 					.render((rect) => instruction.drawResultPage(renderer, rect.top()))
 					.skip(10)
 					.commit(renderer)
-					.usedArea();
+					.usedArea());
 			} catch (e) {
 				console.error("Error while drawing result page", e);
 				page = pdfDoc.addPage(PageSizes.A4);
@@ -180,11 +179,18 @@ export class Printer {
 			}
 		}
 
+		this.drawZk(renderer, rect.top() + 10);
+		this.drawPageNumbers(pages, font, images);
+
+		return await pdfDoc.saveAsBase64({ dataUri: true });
+	}
+
+	drawZk(renderer: Renderer, offsetY: number) {
 		const lineWidth = (renderer.virtual().width() - 20) / 3;
 		const thinkness = 0.2;
 		const offset = 2;
 
-		rect = rect.shrinkFromTop(10);
+		let rect = renderer.virtual().shrinkFromTop(offsetY);
 
 		const points = [
 			new Vector2D(rect.left(), rect.top()),
@@ -201,7 +207,9 @@ export class Printer {
 		}
 
 		renderer.commit();
+	}
 
+	drawPageNumbers(pages: PDFPage[], font: PDFFont, images: { [k: string]: PDFImage }) {
 		let i = 1;
 		for (const page of pages) {
 			const renderer = new RendererImpl({
@@ -217,8 +225,5 @@ export class Printer {
 				.ofValues(rect.right() - 35, rect.bottom() - 10, 30, dpt2mm(size) + 1), size, undefined, "right");
 			renderer.commit();
 		}
-
-		return await pdfDoc.saveAsBase64({ dataUri: true });
 	}
-
 }

@@ -69,7 +69,6 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 		<div class="column">
 			<p class="control">
 				<button @click="reset" class="button is-primary">Reset Form</button>
-				<button @click="emit('triggerUpdate')" class="button is-info">Trigger Update</button>
 			</p>
 		</div>
 	</div>
