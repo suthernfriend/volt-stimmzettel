@@ -45,6 +45,11 @@ export class StarVoteInstructions implements VotePrintInstructions {
 			.replace("${hoechstePunktzahl}", this.voptions.maxPoints.toString());
 		let lastMinListenplatz = 0;
 
+		const xText = this.voptions.maxPoints === 10 ?
+			["0 | Nein", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] : ["0 | Nein", "1", "2", "3", "4", "5"];
+		const xTextOffsets = this.voptions.maxPoints === 10 ?
+			[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] : [0, 0.2, 0.4, 0.6, 0.8, 1];
+
 		rect = rect.shrinkFromTopWithRect(RectWorker.create(rect)
 			.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect, rect, titleFontSize))
 			.skip(3)
@@ -63,13 +68,11 @@ export class StarVoteInstructions implements VotePrintInstructions {
 						.render(rect => {
 							const offsetX = rect.left() + (nameWidth) * rect.width();
 							const xWidth = rect.width() * (boxesWidth) - 5;
-							const xtext = ["0 | Nein", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-							const xs = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-								.map(x => offsetX + xWidth * x);
+							const xs = xTextOffsets.map(x => offsetX + xWidth * x);
 
 							for (let i = 0; i < xs.length; i += 1) {
 								const x = xs[i];
-								const text = xtext[i];
+								const text = xText[i];
 								renderer.drawText(text, Rect.ofValues(x - 5, rect.top(), boxSize + 10, dpt2mm(smallFontSize) + 1), smallFontSize, undefined, "center");
 							}
 
@@ -81,7 +84,7 @@ export class StarVoteInstructions implements VotePrintInstructions {
 					lastMinListenplatz = listenplatz;
 				} else {
 					worker
-						.render(rect => renderer.reserveVertical(Rect.ofValues(rect.left(), rect.top(), rect.width(), 1 + nameFontSize)))
+						.render(rect => renderer.reserveVertical(Rect.ofValues(rect.left(), rect.top(), rect.width(), 1 + nameFontSize)));
 				}
 
 				return worker
@@ -89,8 +92,7 @@ export class StarVoteInstructions implements VotePrintInstructions {
 
 						const offsetX = rect.left() + (nameWidth) * rect.width();
 						const xWidth = rect.width() * (boxesWidth) - 5;
-						const xs = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-							.map(x => offsetX + xWidth * x);
+						const xs = xTextOffsets.map(x => offsetX + xWidth * x);
 
 						for (const x of xs)
 							renderer.drawCheckbox(Rect.ofValues(x, rect.top(), boxSize, boxSize));

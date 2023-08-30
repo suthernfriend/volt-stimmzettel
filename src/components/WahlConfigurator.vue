@@ -51,9 +51,9 @@ watch(voteConfiguration, (value) => {
 <template>
 	<h3 class="title is-4">Wahl #{{ props.id }}: {{ system.name }} / {{ toElect }}</h3>
 	<div class="field" v-if="system.options.includes('toElect')">
-		<label class="label">Zu wählendes Amt / Mandat (@ steht für den Verband, im Dativ)</label>
+		<label class="label">Zu wählendes Amt / Mandat</label>
 		<input v-model="toElect" type="text" class="input"
-			   placeholder='z.B. "Vorsitzende von @" oder "Landesliste von @ zur Wahl zum 11. Deutscher Bundestag"'>
+			   placeholder='z.B. "Vorsitzende von Volt Bremen" oder "Landesliste von von Volt Bremen zur Wahl zum 11. Deutscher Bundestag"'>
 	</div>
 	<div class="field" v-if="system.options.includes('showAssJur')">
 		<label class="checkbox">
@@ -91,7 +91,7 @@ Leer für Ja/Nein/Enthaltung"></textarea>
 		<label class="label">Wie viele Ämter werden gewählt?</label>
 		<input v-model="anzahlAemter" type="number" class="input" placeholder="z.B. 3">
 	</div>
-	<div class="field" v-if="system.options.includes('namen')">
+	<div class="field" v-if="system.options.includes('namen') || system.options.includes('namenUndListenplatz')">
 		<label class="label">Wahlbewerber*innen</label>
 		<NameSelector
 			:want-ass-jur="wanAssJur"

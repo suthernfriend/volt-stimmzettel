@@ -7,6 +7,7 @@ import { BallotTypes } from "@/lib/config/BallotTypes";
 import { RandomStringProviderImpl } from "@/lib/impl/RandomStringProviderImpl";
 import { VotePrintInstructionsFactory } from "@/lib/instructions/VotePrintInstructionsFactory";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import Preview from "@/components/Preview.vue";
 
 const config = ref<PrintSettings>({
 	ballotType: "A4_2",
@@ -219,7 +220,7 @@ async function updateBallot() {
 	}
 }
 
-async function preview(type: "ballot" | "result") {
+async function doPreview(type: "ballot" | "result") {
 	const url = documentUrls[type];
 	console.log(`lastHash: ${lastHash}, currentHash: ${currentConfigurationHash.value}`);
 	if (!url || lastHash !== currentConfigurationHash.value) {
@@ -228,7 +229,7 @@ async function preview(type: "ballot" | "result") {
 	previewUrl.value = documentUrls[type];
 }
 
-async function download(type: "ballot" | "result") {
+async function doDownload(type: "ballot" | "result") {
 	const url = documentUrls[type];
 	console.log(`lastHash: ${lastHash}, currentHash: ${currentConfigurationHash.value}`);
 	if (!url || lastHash !== currentConfigurationHash.value) {
@@ -275,7 +276,7 @@ function downloadFile(dataUrl: string, filename: string) {
 					<div class="column">
 						<div class="field has-addons">
 							<p class="control">
-								<button class="button" @click="preview('ballot')">
+								<button class="button" @click="doPreview('ballot')">
 				  		    <span class="icon is-small">
 										<font-awesome-icon :icon="['fas', 'file-image']" />
 									</span>
@@ -283,7 +284,7 @@ function downloadFile(dataUrl: string, filename: string) {
 								</button>
 							</p>
 							<p class="control">
-								<button class="button" @click="preview('result')">
+								<button class="button" @click="doPreview('result')">
 				  		    <span class="icon is-small">
 										<font-awesome-icon :icon="['far', 'note-sticky']" />
 									</span>
@@ -291,7 +292,7 @@ function downloadFile(dataUrl: string, filename: string) {
 								</button>
 							</p>
 							<p class="control">
-								<button class="button" @click="download('ballot')">
+								<button class="button" @click="doDownload('ballot')">
 				  		    <span class="icon is-small">
 										<font-awesome-icon icon="file-pdf" />
 									</span>
@@ -299,7 +300,7 @@ function downloadFile(dataUrl: string, filename: string) {
 								</button>
 							</p>
 							<p class="control">
-								<button class="button" @click="download('result')">
+								<button class="button" @click="doDownload('result')">
 				  		    <span class="icon is-small">
 										<font-awesome-icon :icon="['far', 'file-pdf']" />
 									</span>
