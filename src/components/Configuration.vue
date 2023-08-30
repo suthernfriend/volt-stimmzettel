@@ -46,8 +46,6 @@ watch([votes, verbandName, veranstaltung, ballotType, zkLeitung, zkMitgliedEins,
 async function createVote() {
 	votes.push({
 		id: votes.length,
-		explanation: "",
-		title: "",
 		system: newVotingSystem.value,
 		config: createDefaultConfiguration()
 	});
@@ -81,7 +79,8 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 			<div class="column is-half">
 				<div class="field">
 					<label class="label">Verband</label>
-					<input v-model="verbandName" type="text" class="input" placeholder="Name des Verbands: z.B. Volt Hessen">
+					<input v-model="verbandName" type="text" class="input"
+						   placeholder="Name des Verbands: z.B. Volt Hessen">
 				</div>
 			</div>
 		</div>
@@ -90,7 +89,7 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 				<div class="field">
 					<label class="label">Veranstaltung</label>
 					<input v-model="veranstaltung" type="text" class="input"
-								 placeholder="Name der Veranstaltung: z.B. 8. ordentlichen Landesparteitag">
+						   placeholder="Name der Veranstaltung: z.B. 8. ordentlichen Landesparteitag">
 				</div>
 			</div>
 			<div class="column">
@@ -104,7 +103,8 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 			<div class="column">
 				<div class="field">
 					<label class="label">Mitglied #1 der Zählkommission</label>
-					<input v-model="zkMitgliedEins" type="text" class="input" placeholder="Name z.B. 'Keira Kneightley'">
+					<input v-model="zkMitgliedEins" type="text" class="input"
+						   placeholder="Name z.B. 'Keira Kneightley'">
 				</div>
 			</div>
 			<div class="column">
@@ -120,7 +120,8 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 		<h3 class="title is-4">Wahlen</h3>
 		<div class="select">
 			<select v-model="newVotingSystem">
-				<option v-for="system in VotingSystems" :key="system.system" :value="system.system">{{ system.name }}</option>
+				<option v-for="system in VotingSystems" :key="system.system" :value="system.system">{{ system.name }}
+				</option>
 			</select>
 		</div>
 		<div class="mt-2">

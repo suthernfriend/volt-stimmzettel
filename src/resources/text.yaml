@@ -6,6 +6,13 @@ votingSystems:
       werden durch leere Felder angezeigt.
     crossCount:
       n: Sie haben 1 Stimme
+  go8: # Einzelwahl
+    explanation: >
+      Die Abstimmung erfolgt gemäß § 8 der Geschäftsordnung für Bundesparteitage von Volt Deutschland. Ein
+      Beschlussantrag ist angenommen, wenn er ${quota} der (Ja-)Stimmen auf sich vereint. Enthaltungen gelten als nicht
+      abgegebene Stimmen.
+    crossCount:
+      n: Sie haben 1 Stimme
   vew:
     explanation: >
       Die Wahl erfolgt gemäß ${referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt sind die 

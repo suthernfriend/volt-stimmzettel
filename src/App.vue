@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Preview from "@/components/Preview.vue";
 import type { PrintSettings } from "@/lib/config/PrintSettings";
-import { reactive, ref, watch } from "vue";
+import { computed, reactive, ref } from "vue";
 import Configuration from "@/components/Configuration.vue";
 import { Printer } from "@/lib/Printer";
 import { BallotTypes } from "@/lib/config/BallotTypes";
@@ -18,6 +17,30 @@ const config = ref<PrintSettings>({
 	zkMitgliedEins: "",
 	zkMitgliedZwei: ""
 });
+
+// const config = ref<PrintSettings>({
+// 	ballotType: "A4_4",
+// 	votes: [{
+// 		config: {
+// 			question: "Soll Volt Deutschland die Resolution „Für eine europäische Klimaunion“ unterstützen?",
+// 			options: [],
+// 			showAssJur: false,
+// 			candidateInfos: [],
+// 			anzahlAemter: 0,
+// 			hoechstePunktzahl: 0,
+// 			referenz: "",
+// 			toElect: "",
+// 			quota: "1/2"
+// 		},
+// 		system: "go8",
+// 		id: 1
+// 	}],
+// 	veranstaltung: "",
+// 	verbandName: "",
+// 	zkLeitung: "",
+// 	zkMitgliedEins: "",
+// 	zkMitgliedZwei: ""
+// });
 
 // const config = ref<PrintSettings>({
 // 	ballotType: "A4_1",
@@ -146,6 +169,12 @@ const config = ref<PrintSettings>({
 
 let updating = false;
 
+const currentConfigurationHash = computed(() => {
+	return JSON.stringify(config.value);
+});
+
+let lastHash = "";
+
 const errorMessage = ref("");
 const previewUrl = ref("");
 const documentUrls = reactive({
@@ -173,7 +202,6 @@ async function updateBallot() {
 	const factory = new VotePrintInstructionsFactory();
 
 	try {
-
 		const instructions = await Promise.all(
 			config.value.votes.map(vote => factory.fromVote(vote, verbandName))
 		);
@@ -181,7 +209,7 @@ async function updateBallot() {
 		documentUrls.ballot = await printer.printBallot(instructions);
 		documentUrls.result = await printer.printResultPage(instructions);
 		documentUrls.ballotId = ballotId;
-
+		lastHash = currentConfigurationHash.value;
 		errorMessage.value = "";
 	} catch (e: any) {
 		console.error(e);
@@ -191,29 +219,23 @@ async function updateBallot() {
 	}
 }
 
-watch(config, () => {
-	console.log("config changed");
-	if (!updating) {
-		updating = true;
-		updateBallot();
-	}
-}, { deep: true });
-
 async function preview(type: "ballot" | "result") {
 	const url = documentUrls[type];
-	if (!url) {
+	console.log(`lastHash: ${lastHash}, currentHash: ${currentConfigurationHash.value}`);
+	if (!url || lastHash !== currentConfigurationHash.value) {
 		await updateBallot();
 	}
-	previewUrl.value = url;
+	previewUrl.value = documentUrls[type];
 }
 
 async function download(type: "ballot" | "result") {
 	const url = documentUrls[type];
-	if (!url) {
+	console.log(`lastHash: ${lastHash}, currentHash: ${currentConfigurationHash.value}`);
+	if (!url || lastHash !== currentConfigurationHash.value) {
 		await updateBallot();
 	}
 	console.log(`Downloading ${type}`);
-	downloadFile(url, `${documentUrls.ballotId}_${type}.pdf`);
+	downloadFile(documentUrls[type], `${documentUrls.ballotId}_${type}.pdf`);
 }
 
 function downloadFile(dataUrl: string, filename: string) {

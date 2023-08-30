@@ -89,21 +89,22 @@ function handleCompletedEvent(e: Event) {
 				<td v-if="props.wantAssJur">
 					<input type="checkbox" class="checkbox" v-model="names[key].assJur">
 				</td>
-				<td v-if="props.wantListenplatz"><input type="number" class="input" v-model="names[key].listenplatz"></td>
+				<td v-if="props.wantListenplatz"><input type="number" class="input" v-model="names[key].listenplatz">
+				</td>
 				<td>
 					<button @click="e => names.splice(key, 1)" type="button" class="button is-danger">Löschen</button>
 				</td>
 			</tr>
 			<tr class="has-background-light">
 				<td><input ref="newVornameInput" @keydown="handleVornameTabEvent" placeholder="Vorname" type="text"
-									 class="input" v-model="newVorname"></td>
+						   class="input" v-model="newVorname"></td>
 				<td><input ref="newNachnameInput" @keydown="handleNachnameTabEvent" placeholder="Nachname" type="text"
-									 class="input" v-model="newNachname"></td>
+						   class="input" v-model="newNachname"></td>
 				<td v-if="props.wantAssJur">
 				</td>
 				<td v-if="props.wantListenplatz">
 					<input ref="newListenplatzInput" type="number" class="input" @keydown="handleListenplatzNrTabEvent"
-								 v-model="newListenplatz"></td>
+						   v-model="newListenplatz"></td>
 				<td>
 					<button @click="handleCompletedEvent" type="button" class="button is-primary">Hinzufügen</button>
 				</td>

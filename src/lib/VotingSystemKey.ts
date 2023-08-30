@@ -1,1 +1,1 @@
-export type VotingSystemKey = "ew" | "vew" | "que" | "borda" | "star";
+export type VotingSystemKey = "go8" | "ew" | "vew" | "que" | "borda" | "star";
