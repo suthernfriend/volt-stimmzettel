@@ -12,6 +12,7 @@ export interface StarVoteInstructionsOptions {
 	maxPoints: 5 | 10;
 	referenz: string;
 	toElect: string;
+	verbandName: string;
 }
 
 export class StarVoteInstructions implements VotePrintInstructions {
@@ -38,7 +39,7 @@ export class StarVoteInstructions implements VotePrintInstructions {
 		const boxesWidth = 1 - nameWidth;
 
 		const text = textProvider().votingSystems.star.explanation
-			.replace("${referenz}", this.voptions.referenz)
+			.replace("${referenz}", this.voptions.referenz.replace("@", this.voptions.verbandName))
 			.replace("${hoechstePunktzahl}", this.voptions.maxPoints.toString());
 
 		const infoText = textProvider().votingSystems.star.crossCount.n
@@ -51,7 +52,7 @@ export class StarVoteInstructions implements VotePrintInstructions {
 			[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] : [0, 0.2, 0.4, 0.6, 0.8, 1];
 
 		rect = rect.shrinkFromTopWithRect(RectWorker.create(rect)
-			.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect, rect, titleFontSize))
+			.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect.replace("@", this.voptions.verbandName), rect, titleFontSize))
 			.skip(3)
 			.render(rect => {
 				return console.log(rect), renderer.drawText(text, rect, smallFontSize);

@@ -52,7 +52,8 @@ export class VotePrintInstructionsFactory {
 					candidates: vote.config.candidateInfos,
 					maxPoints: vote.config.candidateInfos.length < 15 ? 5 : 10,
 					referenz: vote.config.referenz,
-					toElect: vote.config.toElect
+					toElect: vote.config.toElect,
+					verbandName: verbandName
 				});
 			default:
 				throw new Error(`Unknown voting system: ${vote.system}`);

@@ -30,11 +30,12 @@ export abstract class SimpleResultPageVotePrintInstructions implements VotePrint
 		let rect = maxRect;
 
 		rect = rect.shrinkFromTopWithRect(renderer
-			.drawText(`Wahl zum ${this.options.toElect} von ${this.options.verbandName}`, rect, 12))
+			.drawText(`Wahl zum ${this.options.toElect.replace("@", this.options.verbandName)}`, rect, 12))
 			.shrinkFromTop(5);
 
 		rect = rect.shrinkFromTopWithRect(renderer
-			.drawText(textProvider().votingSystems[this.options.system].explanation.replace(`{referenz}`, this.options.referenz), rect, 9))
+			.drawText(textProvider().votingSystems[this.options.system].explanation.replace(`{referenz}`,
+				this.options.referenz.replace("@", this.options.verbandName)), rect, 9))
 			.shrinkFromTop(5);
 
 		const fontSize = 11;

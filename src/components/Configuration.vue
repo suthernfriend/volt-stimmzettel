@@ -4,10 +4,11 @@ import SimpleSelect from "@/components/SimpleSelect.vue";
 import WahlConfigurator from "@/components/WahlConfigurator.vue";
 import type { PrintSettings } from "@/lib/config/PrintSettings";
 import { reactive, ref, watch } from "vue";
-import { createDefaultConfiguration } from "@/lib/config/VoteConfiguration";
+import { copyVoteConfiguration, createDefaultConfiguration } from "@/lib/config/VoteConfiguration";
 import type { VotingSystemKey } from "@/lib/VotingSystemKey";
 import { VotingSystems } from "@/lib/VotingSystems";
 import { BallotTypes } from "@/lib/config/BallotTypes";
+import { voteSetupGroups } from "@/lib/config/VoteSetupHelper";
 
 const emit = defineEmits<{
 	(e: "update:modelValue", printSettings: PrintSettings): void;
@@ -56,6 +57,24 @@ async function reset() {
 }
 
 const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, value]) => ([key, value.name])));
+
+interface VoteSetupDefinition {
+	gremium: string;
+	name: string;
+}
+
+const newVoteGroup = ref<string>("Landesvorstand");
+const newVoteDefinition = ref<string>("Vorsitzender (m/w/d)");
+
+async function createVoteByMandate() {
+	const currentDefinition = voteSetupGroups[newVoteGroup.value][newVoteDefinition.value];
+
+	votes.push({
+		system: currentDefinition.system,
+		config: copyVoteConfiguration(currentDefinition.defaultConfig),
+		id: votes.length
+	});
+}
 
 </script>
 
@@ -118,6 +137,32 @@ const ballotTypes = Object.fromEntries(Object.entries(BallotTypes).map(([key, va
 	<hr />
 	<div>
 		<h3 class="title is-4">Wahlen</h3>
+		<h3 class="title is-5">Neue Wahl anhand des Amts</h3>
+		<div class="columns">
+			<div class="column">
+				<div class="select">
+					<select v-model="newVoteGroup">
+						<option v-for="(_, key) in voteSetupGroups" :key="key" :value="key">
+							{{ key }}
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class="column">
+				<div class="select">
+					<select v-model="newVoteDefinition">
+						<option v-for="(_, key) in voteSetupGroups[newVoteGroup]" :key="key" :value="key">
+							{{ key }}
+						</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="mt-2">
+			<button @click="createVoteByMandate" class="button is-primary">Neue Wahl hinzufügen</button>
+		</div>
+
+		<h3 class="title is-5 mt-5">Neue Wahl anhand des Verfahrens</h3>
 		<div class="select">
 			<select v-model="newVotingSystem">
 				<option v-for="system in VotingSystems" :key="system.system" :value="system.system">{{ system.name }}

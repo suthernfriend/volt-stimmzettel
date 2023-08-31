@@ -1,7 +1,7 @@
 votingSystems:
   ew: # Einzelwahl
     explanation: >
-      Die Wahl erfolgt gemäß ${referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt ist der*die
+      Die Wahl erfolgt gemäß ${referenz}. Gewählt ist der*die
       Bewerber*in die mehr als 50 % der Stimmen auf sich vereint. Enthaltungen gelten als nicht abgegebene Stimmen und 
       werden durch leere Felder angezeigt.
     crossCount:
@@ -15,7 +15,7 @@ votingSystems:
       n: Sie haben 1 Stimme
   vew:
     explanation: >
-      Die Wahl erfolgt gemäß ${referenz} und § 20 der Allgemeinen Wahlordnung von Volt Deutschland. Gewählt sind die 
+      Die Wahl erfolgt gemäß ${referenz}. Gewählt sind die 
       ${anzahlAemter} Bewerber*innen mit den meisten Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und 
       werden durch leere Felder angezeigt.
     crossCount:

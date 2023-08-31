@@ -25,7 +25,7 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 		const maxRect = renderer.virtual().shrinkFromTop(offsetY);
 		let rect = maxRect;
 
-		const text = textProvider().votingSystems.ew.explanation.replace(`{referenz}`, this.voptions.referenz);
+		const text = textProvider().votingSystems.ew.explanation.replace("${referenz}", this.voptions.referenz.replace("@", this.voptions.verbandName));
 		const titleFontSize = 12;
 		const infoFontSize = 11;
 		const nameFontSize = 10;
@@ -82,7 +82,7 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 
 		rect = rect.shrinkFromTopWithRect(
 			RectWorker.create(rect)
-				.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect, rect, titleFontSize))
+				.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect.replace("@", this.voptions.verbandName), rect, titleFontSize))
 				.skip(3)
 				.render(rect => {
 					return console.log(rect), renderer.drawText(text, rect, smallFontSize);
