@@ -34,7 +34,9 @@ export class VotePrintInstructionsFactory {
 					toElect: vote.config.toElect,
 					verbandName: verbandName,
 					referenz: vote.config.referenz,
-					system: vote.system
+					system: vote.system,
+					quota: vote.config.quota,
+					hoechstePunktzahl: vote.config.hoechstePunktzahl
 				});
 			case "borda":
 				return new BordaCountInstructions({
@@ -45,7 +47,9 @@ export class VotePrintInstructionsFactory {
 					toElect: vote.config.toElect,
 					isYesNo: false,
 					system: vote.system,
-					verbandName: verbandName
+					verbandName: verbandName,
+					quota: vote.config.quota,
+					anzahlAemter: vote.config.anzahlAemter
 				});
 			case "star":
 				return new StarVoteInstructions({
