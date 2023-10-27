@@ -11,7 +11,6 @@ import { dpt2mm } from "@/lib/Mm2dpt";
 import type { CandidateInfo } from "@/lib/CandidateInfo";
 
 export interface EinzelwahlInstructionsOptions extends SimpleResultPageVotePrintInstructionsOptions {
-	anzahlAemter: number;
 }
 
 export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstructions {
@@ -25,7 +24,7 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 		const maxRect = renderer.virtual().shrinkFromTop(offsetY);
 		let rect = maxRect;
 
-		const text = textProvider().votingSystems.ew.explanation.replace("${referenz}", this.voptions.referenz.replace("@", this.voptions.verbandName));
+		const text = this.resolveVariables(textProvider().votingSystems.ew.explanation);
 		const titleFontSize = 12;
 		const infoFontSize = 11;
 		const nameFontSize = 10;
@@ -82,7 +81,8 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 
 		rect = rect.shrinkFromTopWithRect(
 			RectWorker.create(rect)
-				.render(rect => renderer.drawText("Wahl zum " + this.voptions.toElect.replace("@", this.voptions.verbandName), rect, titleFontSize))
+				.render(rect => renderer.drawText(
+					this.resolveVariables(`Wahl zum \${toElect}`), rect, titleFontSize))
 				.skip(3)
 				.render(rect => {
 					return console.log(rect), renderer.drawText(text, rect, smallFontSize);

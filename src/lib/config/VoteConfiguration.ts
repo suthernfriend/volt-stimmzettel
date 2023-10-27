@@ -21,12 +21,7 @@ const defaultConfig: VoteConfiguration = {
 	options: [],
 	question: "",
 	quota: "1/2",
-	candidateInfos: [
-		{ vorname: "Craig", nachname: "Juarez", listenplatz: 0, assJur: false },
-		{ vorname: "Terry", nachname: "Henderson", listenplatz: 1, assJur: false },
-		{ vorname: "Lynn", nachname: "Hernandez", listenplatz: 2, assJur: false },
-		{ vorname: "Pamela", nachname: "Harris", listenplatz: 3, assJur: false }
-	],
+	candidateInfos: [],
 	referenz: "§ 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 };
 
@@ -41,7 +36,7 @@ export function copyVoteConfiguration(config: VoteConfiguration): VoteConfigurat
 		quota: config.quota,
 		candidateInfos: [...config.candidateInfos.map((candidate) => ({ ...candidate }))],
 		referenz: config.referenz
-	}
+	};
 }
 
 export function createDefaultConfiguration(): VoteConfiguration {

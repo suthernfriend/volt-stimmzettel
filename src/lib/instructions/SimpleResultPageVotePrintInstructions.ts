@@ -6,6 +6,8 @@ import { textProvider } from "@/lib/impl/TextProvider";
 import { dpt2mm } from "@/lib/Mm2dpt";
 import { Vector2D } from "@/lib/Vector2D";
 import { renderName } from "@/lib/instructions/RenderName";
+import type { VoteQuota } from "@/lib/VoteQuota";
+import { voteQuotaToText } from "@/lib/VoteQuota";
 
 export interface SimpleResultPageVotePrintInstructionsOptions {
 	referenz: string;
@@ -15,11 +17,36 @@ export interface SimpleResultPageVotePrintInstructionsOptions {
 	system: "ew" | "vew" | "que" | "borda";
 	toElect: string;
 	showAssJur: boolean;
+	anzahlAemter: number;
+	hoechstePunktzahl: number;
+	quota: VoteQuota;
 }
 
 export abstract class SimpleResultPageVotePrintInstructions implements VotePrintInstructions {
 
 	constructor(private options: SimpleResultPageVotePrintInstructionsOptions) {
+	}
+
+	protected resolveVariables(input: string) {
+
+		const toReplace: { [key: string]: () => string } = {
+			"@": () => this.options.verbandName,
+			"${referenz}": () => this.options.referenz.replace("@", this.options.verbandName),
+			"${verband}": () => this.options.verbandName,
+			"${toElect}": () => this.options.toElect.replace("@", this.options.verbandName),
+			"${anzahlAemter}": () => this.options.anzahlAemter.toString(),
+			"${hoechstePunktzahl}": () => this.options.hoechstePunktzahl.toString(),
+			"${quota}": () => voteQuotaToText(this.options.quota),
+		};
+
+		let replacedText = input;
+
+		for (const search in toReplace) {
+			while (replacedText.includes(search))
+				replacedText = replacedText.replace(search, toReplace[search]());
+		}
+
+		return replacedText;
 	}
 
 	abstract drawBallot(renderer: Renderer, offsetY: number): Rect;
@@ -30,12 +57,13 @@ export abstract class SimpleResultPageVotePrintInstructions implements VotePrint
 		let rect = maxRect;
 
 		rect = rect.shrinkFromTopWithRect(renderer
-			.drawText(`Wahl zum ${this.options.toElect.replace("@", this.options.verbandName)}`, rect, 12))
+			.drawText(this.resolveVariables(`Wahl zum \${toElect}`), rect, 12))
 			.shrinkFromTop(5);
 
+		const replacedText = this.resolveVariables(textProvider().votingSystems[this.options.system].explanation);
+
 		rect = rect.shrinkFromTopWithRect(renderer
-			.drawText(textProvider().votingSystems[this.options.system].explanation.replace(`{referenz}`,
-				this.options.referenz.replace("@", this.options.verbandName)), rect, 9))
+			.drawText(replacedText, rect, 9))
 			.shrinkFromTop(5);
 
 		const fontSize = 11;

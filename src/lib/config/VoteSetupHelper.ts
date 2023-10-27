@@ -142,6 +142,33 @@ export const voteSetupGroups: VoteSetupGroups = {
 			}
 		}
 	},
+	"Bundesparteitag": {
+		"Delegierte 1. Wahlgang": {
+			system: "que",
+			defaultConfig: {
+				...defaultConfig,
+				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
+				referenz: "§ 19 und § 38 der Allgemeinen Wahlordnung von Volt Deutschland"
+			}
+		},
+		"Delegierte 2. Wahlgang": {
+			system: "vew",
+			defaultConfig: {
+				...defaultConfig,
+				referenz: "§ 39 und § 40 der Allgemeinen Wahlordnung von Volt Deutschland",
+				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
+				anzahlAemter: 10
+			}
+		},
+		"Delegierte 3. Wahlgang": {
+			system: "ew",
+			defaultConfig: {
+				...defaultConfig,
+				referenz: "§ 41 der Allgemeinen Wahlordnung von Volt Deutschland",
+				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
+			}
+		}
+	},
 	"Bundesvorstand": {
 		"Vorsitzender (m/w/d)": {
 			system: "ew",

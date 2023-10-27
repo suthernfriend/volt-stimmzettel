@@ -23,16 +23,15 @@ votingSystems:
       n: Sie haben {n} Stimmen
   que: # Querulantenwahl
     explanation: >
-      Die Wahl erfolgt gemäß ${vote.config.referenz}. Zum nächsten Wahlgang zugelassen sind alle Bewerber*innen, die 
+      Die Wahl erfolgt gemäß ${referenz}. Zum nächsten Wahlgang zugelassen sind alle Bewerber*innen, die 
       mehr Ja- als Nein-Stimmen erhalten. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.
     crossCount:
       n: Sie haben bei jedem*jeder Bewerber*in 1 Stimme
   borda: # Borda-Count
     explanation: >
       Die Wahl erfolgt gemäß ${referenz}. Jedem Bewerber kann dabei eine Punktzahl zwischen 1 und ${hoechstePunktzahl} 
-      vergeben werden, dabei darf keine Punktzahl doppelt vergeben werden. Die ${anzahlAemter} Bewerber*innen mit den
-      höchsten Punktzahlen sind gewählt. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder
-      angezeigt.
+      vergeben werden, dabei darf keine Punktzahl doppelt vergeben werden. Enthaltungen gelten als nicht abgegebene
+      Stimmen und werden durch leere Felder angezeigt.
     crossCount:
       n: Sie können jede Punktzahl von 1 bis ${n} einmal vergeben
   star: # Modified Star Voting
