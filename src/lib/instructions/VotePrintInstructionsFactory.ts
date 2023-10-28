@@ -22,9 +22,10 @@ export class VotePrintInstructionsFactory {
 			case "que":
 				console.log(vote.config);
 
-				const isYesNo = (vote.system === "ew" && vote.config.candidateInfos.length === 1) ||
+				const isYesNo = (!vote.config.enforceSingleSquare) && (
+					(vote.system === "ew" && vote.config.candidateInfos.length === 1) ||
 					(vote.system === "vew" && vote.config.anzahlAemter >= vote.config.candidateInfos.length) ||
-					vote.system === "que";
+					vote.system === "que");
 
 				return new EinzelwahlInstructions({
 					isYesNo,

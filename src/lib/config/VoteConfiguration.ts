@@ -10,6 +10,7 @@ export interface VoteConfiguration {
 	candidateInfos: CandidateInfo[];
 	options: string[];
 	question: string;
+	enforceSingleSquare: boolean;
 	quota: VoteQuota;
 }
 
@@ -18,6 +19,7 @@ const defaultConfig: VoteConfiguration = {
 	showAssJur: false,
 	hoechstePunktzahl: 10,
 	anzahlAemter: 3,
+	enforceSingleSquare: false,
 	options: [],
 	question: "",
 	quota: "1/2",
@@ -31,6 +33,7 @@ export function copyVoteConfiguration(config: VoteConfiguration): VoteConfigurat
 		showAssJur: config.showAssJur,
 		hoechstePunktzahl: config.hoechstePunktzahl,
 		anzahlAemter: config.anzahlAemter,
+		enforceSingleSquare: config.enforceSingleSquare,
 		options: [...config.options],
 		question: config.question,
 		quota: config.quota,

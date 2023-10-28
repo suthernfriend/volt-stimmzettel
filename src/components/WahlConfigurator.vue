@@ -27,6 +27,7 @@ const wanAssJur = ref<boolean>(props.modelValue.showAssJur);
 const question = ref<string>(props.modelValue.question);
 const options = ref<string>(props.modelValue.options.join("\n"));
 const quota = ref<string>(props.modelValue.quota);
+const enforceSingleSquare = ref<boolean>(props.modelValue.enforceSingleSquare);
 
 const voteConfiguration = computed(() => {
 	return {
@@ -38,7 +39,8 @@ const voteConfiguration = computed(() => {
 		showAssJur: wanAssJur.value,
 		options: options.value.split(/\s*\n\s*/).filter(value => value.length > 0),
 		question: question.value,
-		quota: isVoteQuota(quota.value) ? quota.value : "1/2"
+		quota: isVoteQuota(quota.value) ? quota.value : "1/2",
+		enforceSingleSquare: enforceSingleSquare.value
 	} satisfies VoteConfiguration;
 });
 
@@ -90,6 +92,12 @@ Leer für Ja/Nein/Enthaltung"></textarea>
 	<div class="field" v-if="system.options.includes('anzahlAemter')">
 		<label class="label">Wie viele Ämter werden gewählt?</label>
 		<input v-model="anzahlAemter" type="number" class="input" placeholder="z.B. 3">
+	</div>
+	<div class="field" v-if="system.options.includes('showAssJur')">
+		<label class="checkbox">
+			In keinem Fall eine Ja / Nein Abstimmung anzeigen?
+			<input v-model="enforceSingleSquare" class="checkbox" type="checkbox">
+		</label>
 	</div>
 	<div class="field" v-if="system.options.includes('namen') || system.options.includes('namenUndListenplatz')">
 		<label class="label">Wahlbewerber*innen</label>

@@ -8,4 +8,5 @@ export type VotingSystemOptions =
 	| "namen"
 	| "namenUndListenplatz"
 	| "hoechstePunktzahl"
-	| "anzahlAemter";
+	| "anzahlAemter"
+	| "enforceSingleSquare";

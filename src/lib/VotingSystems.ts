@@ -13,7 +13,7 @@ export const VotingSystems: VotingSystem[] = [
 	{
 		system: "vew",
 		name: "Verbundene Einzelwahl: § 20 Allgemeine Wahlordnung",
-		options: ["toElect", "showAssJur", "referenz", "namen", "anzahlAemter"]
+		options: ["toElect", "showAssJur", "referenz", "namen", "anzahlAemter", "enforceSingleSquare"]
 	},
 	{
 		system: "que",

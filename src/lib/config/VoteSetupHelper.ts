@@ -83,6 +83,7 @@ const defaultConfig: VoteConfiguration = {
 	quota: "1/2",
 	question: "",
 	toElect: "",
+	enforceSingleSquare: false,
 	referenz: "",
 	hoechstePunktzahl: 0,
 	anzahlAemter: 1,
@@ -157,7 +158,8 @@ export const voteSetupGroups: VoteSetupGroups = {
 				...defaultConfig,
 				referenz: "§ 39 und § 40 der Allgemeinen Wahlordnung von Volt Deutschland",
 				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
-				anzahlAemter: 10
+				anzahlAemter: 10,
+				enforceSingleSquare: true
 			}
 		},
 		"Delegierte 3. Wahlgang": {
