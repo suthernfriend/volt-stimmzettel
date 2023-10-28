@@ -172,7 +172,7 @@ export class Printer {
 				renderer = createRenderer();
 				rect = renderer.virtual();
 				rect = rect
-					.shrinkFromTopWithRect(await instruction.drawResultPage(renderer, rect.top()))
+					.shrinkFromTopWithRect(instruction.drawResultPage(renderer, rect.top()))
 					.shrinkFromTop(10);
 
 				renderer.commit();

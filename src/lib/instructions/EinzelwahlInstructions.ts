@@ -89,7 +89,7 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 				})
 				.skip(5)
 				.render(rect => renderer.drawText(infoText, rect, infoFontSize))
-				.skip(5)
+				.skip(7.5)
 				.each(this.voptions.candidates, (candidate, worker) => {
 					if (this.voptions.isYesNo)
 						return renderYesNo(worker, candidate);
