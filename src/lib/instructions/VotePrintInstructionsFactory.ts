@@ -2,8 +2,9 @@ import type { VotePrintInstructions } from "@/lib/VotePrintInstructions";
 import type { Vote } from "@/lib/Vote";
 import { EinzelwahlInstructions } from "@/lib/instructions/EinzelwahlInstructions";
 import { BordaCountInstructions } from "@/lib/instructions/BordaCountInstructions";
-import { StarVoteInstructions } from "@/lib/instructions/StarVoteInstructions";
+import { JpkVoteInstructions } from "@/lib/instructions/JpkVoteInstructions";
 import { NormalYesNoInstructions } from "@/lib/instructions/NormalYesNoInstructions";
+import { YvesVoteInstructions } from "@/lib/instructions/YvesVoteInstructions";
 
 export class VotePrintInstructionsFactory {
 
@@ -52,8 +53,15 @@ export class VotePrintInstructionsFactory {
 					quota: vote.config.quota,
 					anzahlAemter: vote.config.anzahlAemter
 				});
-			case "star":
-				return new StarVoteInstructions({
+			case "yves":
+				return new YvesVoteInstructions({
+					candidates: vote.config.candidateInfos,
+					referenz: vote.config.referenz,
+					toElect: vote.config.toElect,
+					verbandName: verbandName
+				});
+			case "jpk":
+				return new JpkVoteInstructions({
 					candidates: vote.config.candidateInfos,
 					maxPoints: vote.config.candidateInfos.length < 15 ? 5 : 10,
 					referenz: vote.config.referenz,

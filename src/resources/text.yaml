@@ -1,19 +1,19 @@
 votingSystems:
-  ew: # Einzelwahl
+  ew: # Einzelwahl: § 19 Allgemeine Wahlordnung
     explanation: >
       Die Wahl erfolgt gemäß ${referenz}. Gewählt ist der*die
       Bewerber*in die mehr als 50 % der Stimmen auf sich vereint. Enthaltungen gelten als nicht abgegebene Stimmen und 
       werden durch leere Felder angezeigt.
     crossCount:
       n: Sie haben 1 Stimme
-  go8: # Einzelwahl
+  go8: # Abstimmung nach § 8 der Geschäftsordnung für Bundesparteitage
     explanation: >
       Die Abstimmung erfolgt gemäß § 8 der Geschäftsordnung für Bundesparteitage von Volt Deutschland. Ein
       Beschlussantrag ist angenommen, wenn er ${quota} der (Ja-)Stimmen auf sich vereint. Enthaltungen gelten als nicht
       abgegebene Stimmen.
     crossCount:
       n: Sie haben 1 Stimme
-  vew:
+  vew: # Verbundene Einzelwahl: § 20 Allgemeine Wahlordnung
     explanation: >
       Die Wahl erfolgt gemäß ${referenz}. Gewählt sind die 
       ${anzahlAemter} Bewerber*innen mit den meisten Stimmen. Enthaltungen gelten als nicht abgegebene Stimmen und 
@@ -21,20 +21,27 @@ votingSystems:
     crossCount:
       1: Sie haben 1 Stimme
       n: Sie haben {n} Stimmen
-  que: # Querulantenwahl
+  que: # Querulantenwahl: § 33 (1) & § 38 Allgemeine Wahlordnung, § 10 (1) SGO
     explanation: >
       Die Wahl erfolgt gemäß ${referenz}. Zum nächsten Wahlgang zugelassen sind alle Bewerber*innen, die 
       mehr Ja- als Nein-Stimmen erhalten. Enthaltungen gelten als nicht abgegebene Stimmen und werden durch leere Felder angezeigt.
     crossCount:
       n: Sie haben bei jedem*jeder Bewerber*in 1 Stimme
-  borda: # Borda-Count
+  borda: # Borda-Count: § 33 (2) Allgemeine Wahlordnung, § 10 (3) SGO
     explanation: >
       Die Wahl erfolgt gemäß ${referenz}. Jedem Bewerber kann dabei eine Punktzahl zwischen 1 und ${hoechstePunktzahl} 
       vergeben werden, dabei darf keine Punktzahl doppelt vergeben werden. Enthaltungen gelten als nicht abgegebene
       Stimmen und werden durch leere Felder angezeigt.
     crossCount:
       n: Sie können jede Punktzahl von 1 bis ${n} einmal vergeben
-  star: # Modified Star Voting
+  yves: # Delegiertenwahlverfahren nach Yves: § 38 Allgemeine Wahlordnung
+    explanation: >
+      Die Wahl erfolgt gemäß ${referenz}. Durch die Summe der Punktzahlen aller Stimmzettel ergibt sich eine Reihenfolge.
+      Bewerber die von mehr als der Hälfte der Stimmberechtigten mit 0 oder keiner Punktzahl bewertet werden, sind 
+      nicht für die Liste zugelassen.
+    crossCount:
+      n: Sie können bei jedem Bewerber eine Punktzahl von 0 bis 10 vergeben.
+  jpk: # Wahlverfahren für staatliche Wahlen nach JPK: § 23 (2) Allgemeine Wahlordnung
     explanation: >
       Die Wahl erfolgt gemäß § 23 der Allgemeinen Wahlordnung von Volt Deutschland. Jedem Bewerber kann dabei eine 
       Punktzahl zwischen 0 und ${hoechstePunktzahl} vergeben werden. Punktzahlen können mehrfach vergeben werden. Die

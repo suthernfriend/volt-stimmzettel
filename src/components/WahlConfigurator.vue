@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
 	(e: "update:modelValue", value: VoteConfiguration): void;
+	(e: "delete"): void;
 }>();
 const system = VotingSystems.find(value => value.system == props.system);
 
@@ -51,11 +52,18 @@ watch(voteConfiguration, (value) => {
 </script>
 
 <template>
-	<h3 class="title is-4">Wahl #{{ props.id }}: {{ system.name }} / {{ toElect }}</h3>
+	<div class="columns">
+		<div class="column is-four-fifths">
+			<h3 class="title is-4">Wahl #{{ props.id }}: {{ system.name }} / {{ toElect }}</h3>
+		</div>
+		<div class="column">
+			<button type="button" @click="emits('delete')" class="button is-danger">Löschen</button>
+		</div>
+	</div>
 	<div class="field" v-if="system.options.includes('toElect')">
 		<label class="label">Zu wählendes Amt / Mandat</label>
 		<input v-model="toElect" type="text" class="input"
-			   placeholder='z.B. "Vorsitzende von Volt Bremen" oder "Landesliste von von Volt Bremen zur Wahl zum 11. Deutscher Bundestag"'>
+					 placeholder='z.B. "Vorsitzende von Volt Bremen" oder "Landesliste von von Volt Bremen zur Wahl zum 11. Deutscher Bundestag"'>
 	</div>
 	<div class="field" v-if="system.options.includes('showAssJur')">
 		<label class="checkbox">
@@ -66,7 +74,7 @@ watch(voteConfiguration, (value) => {
 	<div class="field" v-if="system.options.includes('question')">
 		<label class="label">Welcher Beschluss soll ergehen?</label>
 		<input v-model="question" type="text" class="input"
-			   placeholder="z.B. 'Antrag S4 inkl. der Änderungsanträge S4-Ä1 und S4-Ä3 zustimmen?'">
+					 placeholder="z.B. 'Antrag S4 inkl. der Änderungsanträge S4-Ä1 und S4-Ä3 zustimmen?'">
 	</div>
 	<div class="field" v-if="system.options.includes('quota')">
 		<label class="label">Welche Mehrheit ist für den Beschluss erforderlich?</label>

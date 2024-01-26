@@ -11,9 +11,66 @@ import Preview from "@/components/Preview.vue";
 import { downloadFile } from "@/lib/DownloadFile";
 
 const config = ref<PrintSettings>({
-	ballotType: "A4_2",
-	votes: [],
-	veranstaltung: "<Veranstaltung>",
+	ballotType: "A4_1_Extended",
+	votes: [
+		// {
+	// 	system: "jpk",
+	// 	config: {
+	// 		toElect: "Als Kandidat für die Liste von Volt Deutschland für den Kreistag von Mainz-Bingen",
+	// 		referenz: "§ 21 und folgende der Allgemeinen Wahlordnung von Volt Deutschland",
+	// 		hoechstePunktzahl: 5,
+	// 		anzahlAemter: 0,
+	// 		showAssJur: false,
+	// 		enforceSingleSquare: false,
+	// 		options: [],
+	// 		question: "",
+	// 		quota: "1/2",
+	// 		candidateInfos: [
+	// 			{ vorname: "Philipp", nachname: "Schneider", listenplatz: 1, assJur: false },
+	// 			{ vorname: "Tim", nachname: "Becker", listenplatz: 1, assJur: false },
+	// 			{ vorname: "Felix", nachname: "Schmidt", listenplatz: 1, assJur: false },
+	// 			{ vorname: "Lukas", nachname: "Schulz", listenplatz: 1, assJur: false },
+	// 			{ vorname: "Florian", nachname: "Fischer", listenplatz: 5, assJur: false },
+	// 			{ vorname: "Simon", nachname: "Weber", listenplatz: 5, assJur: false },
+	// 			{ vorname: "Benjamin", nachname: "Meyer", listenplatz: 5, assJur: false },
+	// 			{ vorname: "Jonathan", nachname: "Wagner", listenplatz: 5, assJur: false },
+	// 			{ vorname: "Julian", nachname: "Hoffmann", listenplatz: 3, assJur: false },
+	// 			{ vorname: "Jan", nachname: "Krause", listenplatz: 3, assJur: false },
+	// 			{ vorname: "Oliver", nachname: "Müller", listenplatz: 5, assJur: false },
+	// 			{ vorname: "Max", nachname: "Maier", listenplatz: 3, assJur: false },
+	// 			{ vorname: "Moritz", nachname: "Lehmann", listenplatz: 3, assJur: false },
+	// 			{ vorname: "Stefan", nachname: "Köhler", listenplatz: 3, assJur: false },
+	// 			{ vorname: "Daniel", nachname: "Bauer", listenplatz: 3, assJur: false },
+	// 			{ vorname: "Alexander", nachname: "Günther", listenplatz: 5, assJur: false },
+	// 		]
+	// 	},
+	// 	id: "ff0f3819-82a4-4e0c-880d-f4f2fbaa5064"
+	// },
+	// 	{
+	// 		system: "jpk",
+	// 		config: {
+	// 			toElect: "Als Kandidat für die Liste von Volt Deutschland für den Kreistag von Mainz-Bingen",
+	// 			referenz: "§ 21 und folgende der Allgemeinen Wahlordnung von Volt Deutschland",
+	// 			hoechstePunktzahl: 5,
+	// 			anzahlAemter: 0,
+	// 			showAssJur: false,
+	// 			enforceSingleSquare: false,
+	// 			options: [],
+	// 			question: "",
+	// 			quota: "1/2",
+	// 			candidateInfos: [
+	// 				{ vorname: "Tina", nachname: "Schneider", listenplatz: 1, assJur: false },
+	// 				{ vorname: "Nadja", nachname: "Martens", listenplatz: 1, assJur: false },
+	// 				{ vorname: "Stephanie", nachname: "Tenbaum", listenplatz: 5, assJur: false },
+	// 				{ vorname: "Maria", nachname: "Meier", listenplatz: 5, assJur: false },
+	// 				{ vorname: "Tatajana", nachname: "Müller", listenplatz: 5, assJur: false },
+	// 				{ vorname: "Emanuela", nachname: "Fuchs", listenplatz: 5, assJur: false },
+	// 			]
+	// 		},
+	// 		id: "ff0f3819-82a4-4e0c-880d-f4f2fbaa5064"
+	// 	}
+		],
+	veranstaltung: "Zum*Zur <Veranstaltung>",
 	verbandName: "Volt Deutschland",
 	zkLeitung: "<Leitung>",
 	zkMitgliedEins: "<Mitglied 1>",

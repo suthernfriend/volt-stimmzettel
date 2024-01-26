@@ -23,6 +23,9 @@ export class NormalYesNoInstructions implements VotePrintInstructions {
 	constructor(private options: NormalYesNoInstructionsOptions) {
 	}
 
+	drawCountingHelperPage(renderer: Renderer, offsetY: number): Rect {
+		return Rect.ofValues(0, 0, 0, 0);
+	}
 	drawResultPage(renderer: Renderer, offsetY: number): Rect {
 
 		const maxRect = renderer.virtual().shrinkFromTop(offsetY);

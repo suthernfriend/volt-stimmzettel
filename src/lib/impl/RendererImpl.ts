@@ -46,7 +46,8 @@ export class RendererImpl implements Renderer {
 				return Rect.ofValues(0, 0, 0, 0);
 			} else if (yCurrent >= areaTop && yRequired > areaBottom) {
 				// rect does not fit into this area, but we can skip to the next one
-				return Rect.ofValues(0, areaBottom - yCurrent, 0, 0);
+				const skipHeight = areaBottom - yCurrent;
+				return Rect.ofValues(0, 0, 0, skipHeight);
 			} else if (yCurrent < areaTop) {
 				// rect is above this area, we can skip to it
 				offset += areaBottom;

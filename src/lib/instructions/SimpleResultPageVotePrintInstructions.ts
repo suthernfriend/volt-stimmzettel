@@ -27,6 +27,10 @@ export abstract class SimpleResultPageVotePrintInstructions implements VotePrint
 	constructor(private options: SimpleResultPageVotePrintInstructionsOptions) {
 	}
 
+	drawCountingHelperPage(renderer: Renderer, offsetY: number): Rect {
+		return Rect.ofValues(0, 0, 0, 0);
+	}
+
 	protected resolveVariables(input: string) {
 
 		const toReplace: { [key: string]: () => string } = {
@@ -36,7 +40,7 @@ export abstract class SimpleResultPageVotePrintInstructions implements VotePrint
 			"${toElect}": () => this.options.toElect.replace("@", this.options.verbandName),
 			"${anzahlAemter}": () => this.options.anzahlAemter.toString(),
 			"${hoechstePunktzahl}": () => this.options.hoechstePunktzahl.toString(),
-			"${quota}": () => voteQuotaToText(this.options.quota),
+			"${quota}": () => voteQuotaToText(this.options.quota)
 		};
 
 		let replacedText = input;

@@ -9,6 +9,7 @@ import type { VotingSystemKey } from "@/lib/VotingSystemKey";
 import { VotingSystems } from "@/lib/VotingSystems";
 import { BallotTypes } from "@/lib/config/BallotTypes";
 import { voteSetupGroups } from "@/lib/config/VoteSetupHelper";
+import { v4 } from "uuid";
 
 const emit = defineEmits<{
 	(e: "update:modelValue", printSettings: PrintSettings): void;
@@ -46,7 +47,7 @@ watch([votes, verbandName, veranstaltung, ballotType, zkLeitung, zkMitgliedEins,
 
 async function createVote() {
 	votes.push({
-		id: votes.length,
+		id: v4(),
 		system: newVotingSystem.value,
 		config: createDefaultConfiguration()
 	});
@@ -72,8 +73,17 @@ async function createVoteByMandate() {
 	votes.push({
 		system: currentDefinition.system,
 		config: copyVoteConfiguration(currentDefinition.defaultConfig),
-		id: votes.length
+		id: v4()
 	});
+}
+
+function removeVote(id: number) {
+	console.log(`Removing vote ${id} ${votes[id].config.toElect}`)
+
+	console.log(votes.map(value => value.config.toElect));
+	console.log(votes.slice(id, 1)[0].config.toElect);
+	votes.splice(id, 1);
+	console.log(votes.map(value => value.config.toElect));
 }
 
 </script>
@@ -99,7 +109,7 @@ async function createVoteByMandate() {
 				<div class="field">
 					<label class="label">Verband</label>
 					<input v-model="verbandName" type="text" class="input"
-						   placeholder="Name des Verbands: z.B. Volt Hessen">
+								 placeholder="Name des Verbands: z.B. Volt Hessen">
 				</div>
 			</div>
 		</div>
@@ -108,7 +118,7 @@ async function createVoteByMandate() {
 				<div class="field">
 					<label class="label">Veranstaltung</label>
 					<input v-model="veranstaltung" type="text" class="input"
-						   placeholder="Name der Veranstaltung: z.B. 8. ordentlichen Landesparteitag">
+								 placeholder="Name der Veranstaltung: z.B. 8. ordentlichen Landesparteitag">
 				</div>
 			</div>
 			<div class="column">
@@ -123,7 +133,7 @@ async function createVoteByMandate() {
 				<div class="field">
 					<label class="label">Mitglied #1 der Zählkommission</label>
 					<input v-model="zkMitgliedEins" type="text" class="input"
-						   placeholder="Name z.B. 'Keira Kneightley'">
+								 placeholder="Name z.B. 'Keira Kneightley'">
 				</div>
 			</div>
 			<div class="column">
@@ -173,8 +183,8 @@ async function createVoteByMandate() {
 			<button @click="createVote" class="button is-primary">Neue Wahl hinzufügen</button>
 		</div>
 		<hr>
-		<div v-for="(_, i) in votes" :key="i">
-			<WahlConfigurator :id="i" :system="votes[i].system" v-model="votes[i].config" />
+		<div v-for="(_, i) in votes" :key="votes[i].id">
+			<WahlConfigurator @delete="votes.splice(i, 1)" :id="i" :system="votes[i].system" v-model="votes[i].config" />
 			<hr>
 		</div>
 	</div>

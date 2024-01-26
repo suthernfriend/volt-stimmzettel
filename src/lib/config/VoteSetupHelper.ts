@@ -96,7 +96,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Vorsitzende*r von @",
+				toElect: "Wahl zum*zur Vorsitzende*n von @",
 				referenz: "§ 16 der Satzung von @, § 19 und § 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -104,7 +104,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Vorsitzende*r von @",
+				toElect: "Wahl zum*zur Vorsitzende*n von @",
 				referenz: "§ 16 der Satzung von @, § 19 und § 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -112,7 +112,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Schatzmeister*in von @",
+				toElect: "Wahl zum*zur Schatzmeister*in von @",
 				referenz: "§ 16 der Satzung von @, § 19 und § 32 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -120,7 +120,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Stellvertretende*r Vorsitzende*r von @",
+				toElect: "Wahl zum*zur stellvertretende*n Vorsitzende*n von @",
 				referenz: "§ 16 der Satzung von @, § 19 und § 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -128,7 +128,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "que",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Stellvertretende*r Vorsitzende*r von @",
+				toElect: "Wahl zum*zur stellvertretende*n Vorsitzende*n von @",
 				referenz: "§ 16 der Satzung von @, § 19 und § 33 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -136,7 +136,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "borda",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Stellvertretende*r Vorsitzende*r von @",
+				toElect: "Wahl zum*zur stellvertretende*n Vorsitzende*n von @",
 				referenz: "§ 16 der Satzung von @, § 19 und § 33 der Allgemeinen Wahlordnung von Volt Deutschland",
 				hoechstePunktzahl: 2,
 				anzahlAemter: 2
@@ -148,7 +148,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "que",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
+				toElect: "Wahl der Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
 				referenz: "§ 19 und § 38 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -157,7 +157,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				referenz: "§ 39 und § 40 der Allgemeinen Wahlordnung von Volt Deutschland",
-				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
+				toElect: "Wahl der Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
 				anzahlAemter: 10,
 				enforceSingleSquare: true
 			}
@@ -167,7 +167,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				referenz: "§ 41 der Allgemeinen Wahlordnung von Volt Deutschland",
-				toElect: "Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland",
+				toElect: "Wahl der Landesdelegierten für @ zum Bundesparteitag von Volt Deutschland"
 			}
 		}
 	},
@@ -176,7 +176,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Vorsitzende*r von @",
+				toElect: "Wahl zum*zur Vorsitzende*n von @",
 				referenz: "§ 19 und § 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -184,7 +184,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Vorsitzende*r von @",
+				toElect: "Wahl zum*zur Vorsitzende*n von @",
 				referenz: "§ 19 und § 31 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -192,21 +192,21 @@ export const voteSetupGroups: VoteSetupGroups = {
 			system: "ew",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Schatzmeister*in von @",
+				toElect: "Wahl zum*zur Schatzmeister*in von @",
 				referenz: "§ 19 und § 32 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		}, "Stellvertretende*r Vorsitzende*r 1. Wahlgang": {
 			system: "que",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Stellvertretende*r Vorsitzende*r von @",
+				toElect: "Wahl zum*zur stellvertretende*n Vorsitzende*n von @",
 				referenz: "§ 19 und § 33 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		}, "Stellvertretende*r Vorsitzende*r 2. Wahlgang": {
 			system: "borda",
 			defaultConfig: {
 				...defaultConfig,
-				toElect: "Stellvertretende*r Vorsitzende*r von @",
+				toElect: "Wahl zum*zur stellvertretende*n Vorsitzende*n von @",
 				referenz: "§ 19 und § 33 der Allgemeinen Wahlordnung von Volt Deutschland",
 				hoechstePunktzahl: 2,
 				anzahlAemter: 2
@@ -219,7 +219,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				showAssJur: true,
-				toElect: "Vorsitzende*r des Bundesschiedsgerichts von @",
+				toElect: "Wahl zum*zur Vorsitzenden des Bundesschiedsgerichts von @",
 				referenz: "§ 9 der Schiedsgerichtsordnung von Volt Deutschland und § 19 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -228,7 +228,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				showAssJur: true,
-				toElect: "Stellvertretende*r Vorsitzende*r des Bundesschiedsgerichts von @",
+				toElect: "Wahl zum*zur stellvertretenden Vorsitzende*n des Bundesschiedsgerichts von @",
 				referenz: "§ 9 der Schiedsgerichtsordnung von Volt Deutschland und § 19 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -237,7 +237,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				showAssJur: true,
-				toElect: "Beisitzer*in des Bundesschiedsgerichts von @",
+				toElect: "Wahl zum*zur Beisitzer*in des Bundesschiedsgerichts von @",
 				referenz: "§ 9 der Schiedsgerichtsordnung von Volt Deutschland und § 19 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		},
@@ -246,7 +246,7 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				showAssJur: true,
-				toElect: "Stellvertretende*r Schiedsrichter*in des Bundesschiedsgerichts von @",
+				toElect: "Wahl zum*zur stellvertretenden Schiedsrichter*in des Bundesschiedsgerichts von @",
 				referenz: "§ 10 der Schiedsgerichtsordnung von Volt Deutschland"
 			}
 		},
@@ -255,10 +255,29 @@ export const voteSetupGroups: VoteSetupGroups = {
 			defaultConfig: {
 				...defaultConfig,
 				showAssJur: true,
-				toElect: "Stellvertretende*r Schiedsrichter*in des Bundesschiedsgerichts von @",
+				toElect: "Wahl zum*zur stellvertretenden des Bundesschiedsgerichts von @",
 				referenz: "§ 10 der Schiedsgerichtsordnung von Volt Deutschland",
 				hoechstePunktzahl: 5,
 				anzahlAemter: 5
+			}
+		}
+	},
+	"Staatliche Wahlen": {
+		"Komplexes Wahlverfahren 1. Wahlgang (m/d oder w/d)": {
+			system: "jpk",
+			defaultConfig: {
+				...defaultConfig,
+				toElect: "Wahl für die Liste von Volt Deutschland für die Wahl zum XYZ der Stadt XYZ",
+				referenz: "§ 23 Abs. 2 und 3 der Allgemeinen Wahlordnung von Volt Deutschland",
+				hoechstePunktzahl: 10
+			}
+		},
+		"Komplexes Wahlverfahren 2. Wahlgang": {
+			system: "ew",
+			defaultConfig: {
+				...defaultConfig,
+				toElect: "Wahl für den Spitzenplatz der Liste von Volt Deutschland für die Wahl zum XYZ der Stadt XYZ",
+				referenz: "§ 23 Abs. 4 der Allgemeinen Wahlordnung von Volt Deutschland"
 			}
 		}
 	}

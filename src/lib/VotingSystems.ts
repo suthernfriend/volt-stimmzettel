@@ -26,8 +26,13 @@ export const VotingSystems: VotingSystem[] = [
 		options: ["toElect", "showAssJur", "referenz", "namen", "hoechstePunktzahl"]
 	},
 	{
-		system: "star",
-		name: "Modifiziertes Star-Voting: § 23 (2) Allgemeine Wahlordnung",
+		system: "jpk",
+		name: "Wahlverfahren für staatliche Wahlen nach JPK: § 23 (2) Allgemeine Wahlordnung",
 		options: ["toElect", "referenz", "namenUndListenplatz"]
+	},
+	{
+		system: "yves",
+		name: "Delegiertenwahlverfahren nach Yves: § 38 Allgemeine Wahlordnung",
+		options: ["toElect", "referenz", "namen"]
 	}
 ];

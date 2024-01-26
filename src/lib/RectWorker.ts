@@ -40,12 +40,13 @@ export class RectWorker {
 		return Rect.ofValues(this.originalRect.left(), this.originalRect.top(), this.originalRect.width(), this.originalRect.height() - this.rect.height());
 	}
 
-	each<T>(arr: T[], mapper: (item: T, worker: RectWorker) => RectWorker): RectWorker {
+	each<T>(arr: T[], mapper: (item: T, worker: RectWorker, index: number) => RectWorker): RectWorker {
 
 		let worker: RectWorker = this;
-
+		let i = 0;
 		for (const item of arr) {
-			worker = mapper(item, worker);
+			worker = mapper(item, worker, i);
+			i++;
 		}
 
 		return worker;

@@ -19,6 +19,10 @@ export class EinzelwahlInstructions extends SimpleResultPageVotePrintInstruction
 		super(voptions);
 	}
 
+	drawCountingHelperPage(renderer: Renderer, offsetY: number): Rect {
+		return Rect.ofValues(0, 0, 0, 0);
+	}
+
 	drawBallot(renderer: Renderer, offsetY: number): Rect {
 
 		const maxRect = renderer.virtual().shrinkFromTop(offsetY);
